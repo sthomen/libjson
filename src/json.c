@@ -6,7 +6,14 @@
 const char *unknown = "?";
 
 char *json_encode(JSONItem *item) {
+	// should we handle programming errors?
+	if (item == NULL)
+		return (char *)nullstr;
+
 	switch (item->type) {
+		case JSON_NULL:
+			return (char *)nullstr;
+
 		case JSON_BOOLEAN:
 			return (char *)boolean[item->boolean];
 			
@@ -28,6 +35,7 @@ char *json_encode(JSONItem *item) {
 
 void json_free(JSONItem *item) {
 	switch (item->type) {
+		case JSON_NULL:
 		case JSON_BOOLEAN:
 		case JSON_INTEGER:
 			break;
@@ -47,5 +55,8 @@ void json_free(JSONItem *item) {
 
 
 JSONItem *json_decode(char *input) {
+	JSONItem *item = (JSONItem *)malloc(sizeof(JSONItem));
 
+	return item;
 }
+

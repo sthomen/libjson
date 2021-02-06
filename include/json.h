@@ -1,6 +1,8 @@
 #ifndef _JSON_H_
 #define _JSON_H_
 
+const char *nullstr = "null";
+
 const char *boolean[] = {
 	"false",
 	"true"
@@ -11,6 +13,7 @@ typedef struct json_item JSONItem;
 
 struct json_item {
 	enum {
+		JSON_NULL,
 		JSON_BOOLEAN,
 		JSON_INTEGER,
 		JSON_DECIMAL,
