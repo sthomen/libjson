@@ -1,30 +1,39 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <inttypes.h>
 
 #include "json.h"
 
-const char *unknown = "?";
-
 char *json_encode(JSONItem *item) {
+	char *output;
+
 	// should we handle programming errors?
-	if (item == NULL)
-		return (char *)nullstr;
+	if (item == NULL) {
+		item = json_create(JSON_NULL);
+	}
 
 	switch (item->type) {
 		case JSON_NULL:
-			return (char *)nullstr;
+			output = (char *)malloc(strlen(nullstr));
+			strcpy(output, nullstr);
+			break;
 
 		case JSON_BOOLEAN:
-			return (char *)boolstr[item->value.boolean];
-			
+			output = (char *)malloc(strlen(boolstr[item->value.boolean]));
+			strcpy(output, boolstr[item->value.boolean]);
+			break;
+
 		case JSON_INTEGER:
-			return (char *)unknown;
-			
+			break;
+
 		case JSON_DECIMAL:
-			return (char *)unknown;
+			break;
 
 		case JSON_STRING:
-			return item->value.string;
+			output = (char *)malloc(strlen(item->value.string) + 2);
+			sprintf(output, "\"%s\"", item->value.string);
+			break;
 
 		case JSON_LIST:
 		case JSON_OBJECT:
@@ -32,7 +41,7 @@ char *json_encode(JSONItem *item) {
 			break;
 	}
 
-	return (char *)unknown;
+	return output;
 }
 
 void json_free(JSONItem *item) {
@@ -58,6 +67,13 @@ void json_free(JSONItem *item) {
 JSONItem *json_create(enum json_types type) {
 	JSONItem *item = (JSONItem *)malloc(sizeof(JSONItem));
 	item->type = type;
+	return item;
+}
+
+JSONItem *json_create_string(char *string) {
+	JSONItem *item = json_create(JSON_STRING);
+	item->value.string = (char *)malloc(strlen(string));
+	strcpy(item->value.string, string);
 	return item;
 }
 
