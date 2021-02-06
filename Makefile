@@ -5,7 +5,7 @@ CC ?= cc
 CCARGS ?= -fPIC
 CFLAGS += $(CCARGS) -Iinclude
 
-LDARGS ?= -shared
+LDARGS ?= -lm -shared
 LDFLAGS += $(LDARGS)
 
 RM ?= rm -f
@@ -14,6 +14,7 @@ RM ?= rm -f
 PROGRAM = libjson.so
 
 SRCS =\
+	src/number.c \
 	src/json.c
 
 OBJS = ${SRCS:S/.c/.o/g}

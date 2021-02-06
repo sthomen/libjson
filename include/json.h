@@ -8,8 +8,7 @@ struct json_item {
 	enum json_types {
 		JSON_NULL,
 		JSON_BOOLEAN,
-		JSON_INTEGER,
-		JSON_DECIMAL,
+		JSON_NUMBER,
 		JSON_STRING,
 		JSON_LIST,
 		JSON_OBJECT
@@ -17,8 +16,7 @@ struct json_item {
 
 	union {
 		unsigned int boolean : 1;
-		int64_t      integer;
-		float        decimal;
+		double       number;
 		char         *string;
 		JSONItem     *list;
 		JSONPair     **object;
@@ -29,7 +27,6 @@ struct json_pair {
 	char     *key;
 	JSONItem *value;
 };
-
 
 JSONItem *json_decode(char *input);
 char *json_encode(JSONItem *root);

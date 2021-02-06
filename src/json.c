@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <math.h>
 
+#include "number.h"
 #include "json.h"
 
 const char *nullstr = "null";
@@ -29,10 +31,8 @@ char *json_encode(JSONItem *item) {
 			strcpy(output, boolstr[item->value.boolean]);
 			break;
 
-		case JSON_INTEGER:
-			break;
-
-		case JSON_DECIMAL:
+		case JSON_NUMBER:
+			output = number_to_string(item->value.number);
 			break;
 
 		case JSON_STRING:
@@ -52,8 +52,7 @@ char *json_encode(JSONItem *item) {
 void json_free(JSONItem *item) {
 	switch (item->type) {
 		case JSON_NULL:
-		case JSON_BOOLEAN:
-		case JSON_INTEGER:
+		case JSON_NUMBER:
 			break;
 
 		case JSON_STRING:
@@ -85,5 +84,6 @@ JSONItem *json_create_string(char *string) {
 
 
 JSONItem *json_decode(char *input) {
+	return NULL;
 }
 
