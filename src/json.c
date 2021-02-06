@@ -15,7 +15,7 @@ char *json_encode(JSONItem *item) {
 			return (char *)nullstr;
 
 		case JSON_BOOLEAN:
-			return (char *)boolstr[item->boolean];
+			return (char *)boolstr[item->value.boolean];
 			
 		case JSON_INTEGER:
 			return (char *)unknown;
@@ -24,13 +24,15 @@ char *json_encode(JSONItem *item) {
 			return (char *)unknown;
 
 		case JSON_STRING:
-			return item->string;
+			return item->value.string;
 
 		case JSON_LIST:
 		case JSON_OBJECT:
 			/* TODO recurse */
 			break;
 	}
+
+	return (char *)unknown;
 }
 
 void json_free(JSONItem *item) {
@@ -41,7 +43,7 @@ void json_free(JSONItem *item) {
 			break;
 
 		case JSON_STRING:
-			free(item->string);
+			free(item->value.string);
 			break;
 
 		case JSON_LIST:

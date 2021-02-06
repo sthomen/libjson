@@ -23,19 +23,19 @@ struct json_item {
 	} type;
 
 	union {
-		int      boolean : 1;
-		int64_t  integer;
-		float    decimal;
-		char     *string;
-		JSONItem *list;
-		JSONPair **object;
-	};
+		unsigned int boolean : 1;
+		int64_t      integer;
+		float        decimal;
+		char         *string;
+		JSONItem     *list;
+		JSONPair     **object;
+	} value;
 };
 
-typedef struct json_pair {
+struct json_pair {
 	char     *key;
 	JSONItem *value;
-} JSONPair;
+};
 
 
 JSONItem *json_decode(char *input);
