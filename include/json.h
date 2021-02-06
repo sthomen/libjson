@@ -1,13 +1,6 @@
 #ifndef _JSON_H_
 #define _JSON_H_
 
-const char *nullstr = "null";
-
-const char *boolstr[] = {
-	"false",
-	"true"
-};
-
 typedef struct json_pair JSONPair;
 typedef struct json_item JSONItem;
 

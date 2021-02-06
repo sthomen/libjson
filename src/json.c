@@ -5,13 +5,18 @@
 
 #include "json.h"
 
+const char *nullstr = "null";
+
+const char *boolstr[] = {
+	"false",
+	"true"
+};
+
 char *json_encode(JSONItem *item) {
 	char *output;
 
-	// should we handle programming errors?
-	if (item == NULL) {
+	if (item == NULL)
 		item = json_create(JSON_NULL);
-	}
 
 	switch (item->type) {
 		case JSON_NULL:
