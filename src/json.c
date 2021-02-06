@@ -15,7 +15,7 @@ char *json_encode(JSONItem *item) {
 			return (char *)nullstr;
 
 		case JSON_BOOLEAN:
-			return (char *)boolean[item->boolean];
+			return (char *)boolstr[item->boolean];
 			
 		case JSON_INTEGER:
 			return (char *)unknown;

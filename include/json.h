@@ -3,7 +3,7 @@
 
 const char *nullstr = "null";
 
-const char *boolean[] = {
+const char *boolstr[] = {
 	"false",
 	"true"
 };
