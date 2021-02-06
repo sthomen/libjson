@@ -12,7 +12,7 @@ typedef struct json_pair JSONPair;
 typedef struct json_item JSONItem;
 
 struct json_item {
-	enum {
+	enum json_types {
 		JSON_NULL,
 		JSON_BOOLEAN,
 		JSON_INTEGER,
@@ -40,6 +40,8 @@ struct json_pair {
 
 JSONItem *json_decode(char *input);
 char *json_encode(JSONItem *root);
+
+JSONItem *json_create(enum json_types type);
 void json_free(JSONItem *root);
 
 #endif /* _JSON_H_ */

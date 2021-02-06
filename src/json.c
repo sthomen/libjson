@@ -55,10 +55,13 @@ void json_free(JSONItem *item) {
 	free(item);
 }
 
+JSONItem *json_create(enum json_types type) {
+	JSONItem *item = (JSONItem *)malloc(sizeof(JSONItem));
+	item->type = type;
+	return item;
+}
+
 
 JSONItem *json_decode(char *input) {
-	JSONItem *item = (JSONItem *)malloc(sizeof(JSONItem));
-
-	return item;
 }
 
