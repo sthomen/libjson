@@ -38,6 +38,6 @@ TEST_LDFLAGS ?= -L. -Wl,-rpath,. -ljson
 CMOCKA_CFLAGS ?= -I/usr/pkg/include
 CMOCKA_LDFLAGS ?= -L/usr/pkg/lib -Wl,-rpath,/usr/pkg/lib -lcmocka
 
-test: $(PROGRAM)
+test: $(PROGRAM) src/test.c
 	$(CC) $(CMOCKA_CFLAGS) $(TEST_CFLAGS) -o $@ src/test.c $(TEST_LDFLAGS) $(CMOCKA_LDFLAGS)
 	./test
