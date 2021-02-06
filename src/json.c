@@ -71,6 +71,7 @@ void json_free(JSONItem *item) {
 
 JSONItem *json_create(enum json_types type) {
 	JSONItem *item = (JSONItem *)malloc(sizeof(JSONItem));
+	memset(item, 0, sizeof(JSONItem));
 	item->type = type;
 	return item;
 }
