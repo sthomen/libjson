@@ -1,0 +1,42 @@
+#ifndef _JSON_H_
+#define _JSON_H_
+
+const char *boolean[] = {
+	"false",
+	"true"
+};
+
+typedef struct json_pair JSONPair;
+typedef struct json_item JSONItem;
+
+struct json_item {
+	enum {
+		JSON_BOOLEAN,
+		JSON_INTEGER,
+		JSON_DECIMAL,
+		JSON_STRING,
+		JSON_LIST,
+		JSON_OBJECT
+	} type;
+
+	union {
+		int      boolean : 1;
+		int64_t  integer;
+		float    decimal;
+		char     *string;
+		JSONItem *list;
+		JSONPair **object;
+	};
+};
+
+typedef struct json_pair {
+	char     *key;
+	JSONItem *value;
+} JSONPair;
+
+
+JSONItem *json_decode(char *input);
+char *json_encode(JSONItem *root);
+void json_free(JSONItem *root);
+
+#endif /* _JSON_H_ */
