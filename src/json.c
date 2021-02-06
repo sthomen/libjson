@@ -8,13 +8,13 @@ const char *unknown = "?";
 char *json_encode(JSONItem *item) {
 	switch (item->type) {
 		case JSON_BOOLEAN:
-			return boolean[item->boolean];
+			return (char *)boolean[item->boolean];
 			
 		case JSON_INTEGER:
-			return unknown;
+			return (char *)unknown;
 			
 		case JSON_DECIMAL:
-			return unknown;
+			return (char *)unknown;
 
 		case JSON_STRING:
 			return item->string;
