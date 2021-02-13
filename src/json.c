@@ -3,6 +3,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <math.h>
+#include <assert.h>
 
 #include "number.h"
 #include "json.h"
@@ -16,6 +17,9 @@ const char *boolstr[] = {
 
 char *json_encode(JSONItem *item) {
 	char *output;
+	int outlen, len;
+	char *p;
+	JSONList *list;
 
 	if (item == NULL)
 		item = json_create(JSON_NULL);
@@ -41,8 +45,38 @@ char *json_encode(JSONItem *item) {
 			break;
 
 		case JSON_LIST:
+			output = (char *)malloc(3); // default to []\0
+			output[0] = '[';
+			outlen = 1;
+
+			if (item->value.list != NULL) {
+				list = item->value.list;
+
+				do {
+					p = json_encode(list->item);
+					len = strlen(p);
+
+					// the magic number 2 here is for the , (or ] for the last entry)
+					// and the terminating NULL.
+					output = (char *)realloc(output, outlen + len + 2);
+					memcpy(output+outlen, p, len);
+					outlen += len;
+					output[outlen] = ',';
+					outlen++;
+
+					list = list->next;
+				} while (list != NULL);
+
+				// move back one spot, so the final , will be replaced with a ]
+				outlen--;
+			}
+
+			output[outlen] = ']';
+			output[outlen+1] = '\0';
+
+			break;
+
 		case JSON_OBJECT:
-			/* TODO recurse */
 			break;
 	}
 
@@ -50,6 +84,11 @@ char *json_encode(JSONItem *item) {
 }
 
 void json_free(JSONItem *item) {
+	JSONList *list, *tmp;
+
+	if (item == NULL)
+		return;
+
 	switch (item->type) {
 		case JSON_NULL:
 		case JSON_NUMBER:
@@ -60,8 +99,16 @@ void json_free(JSONItem *item) {
 			break;
 
 		case JSON_LIST:
+			list = item->value.list;
+
+			while (list != NULL) {
+				tmp = list;
+				list = tmp->next;
+				json_free(tmp->item);
+				free(tmp);
+			}
+			break;
 		case JSON_OBJECT:
-			/* TODO recurse */
 			break;
 	}
 
@@ -82,6 +129,26 @@ JSONItem *json_create_string(char *string) {
 	return item;
 }
 
+void json_list_add_item(JSONItem *root, JSONItem *item) {
+	JSONList *list, *new;
+
+	assert(root->type == JSON_LIST);
+
+	list = root->value.list;
+	new = (JSONList *)malloc(sizeof(JSONList));
+
+	new->item = item;
+	new->next = NULL;
+
+	if (list == NULL) {
+		root->value.list = new;
+	} else {
+		while (list->next != NULL)
+			list = list->next;
+
+		list->next = new;
+	}
+}
 
 JSONItem *json_decode(char *input) {
 	return NULL;

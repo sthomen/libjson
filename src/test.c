@@ -120,6 +120,125 @@ void encoding_a_large_floating_point_number_outputs_a_decimal_string(void **stat
 	json_free(item);
 }
 
+void encoding_an_empty_list_outputs_brackets_and_null(void **state) {
+	char *json;
+	JSONItem *item = json_create(JSON_LIST);
+
+	json = json_encode(item);
+
+	assert_string_equal("[]", json);
+
+	free(json);
+	json_free(item);
+}
+
+void encoding_a_list_with_a_single_string_item(void **state) {
+	char *json;
+	JSONItem *item = json_create(JSON_LIST);
+	JSONItem *new = json_create_string("Hello!");
+	json_list_add_item(item, new);
+
+	json = json_encode(item);
+
+	assert_string_equal("[\"Hello!\"]", json);
+	
+	free(json);
+	json_free(item);
+}
+
+void encoding_a_list_with_multiple_string_items(void **state) {
+	char *json;
+	JSONItem *root, *item;
+
+	root = json_create(JSON_LIST);
+	json_list_add_item(root, json_create_string("Hello"));
+	json_list_add_item(root, json_create_string("World!"));
+
+	json = json_encode(root);
+
+	assert_string_equal("[\"Hello\",\"World!\"]", json);
+	
+	free(json);
+	json_free(root);
+}
+
+void encoding_a_list_with_all_bare_types(void **state) {
+	char *json;
+	JSONItem *root, *item;
+
+	root = json_create(JSON_LIST);
+	json_list_add_item(root, json_create_string("a string"));
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\"]", json);
+	free(json);
+
+	json_list_add_item(root, json_create(JSON_NULL));
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\",null]", json);
+	free(json);
+
+	json_list_add_item(root, NULL);
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\",null,null]", json);
+	free(json);
+
+	item = json_create(JSON_BOOLEAN);
+	item->value.boolean = 1;
+	json_list_add_item(root, item);
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\",null,null,true]", json);
+	free(json);
+
+	item = json_create(JSON_BOOLEAN);
+	item->value.boolean = 0;
+	json_list_add_item(root, item);
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\",null,null,true,false]", json);
+	free(json);
+
+	item = json_create(JSON_NUMBER);
+	item->value.number = 3.14;
+	json_list_add_item(root, item);
+
+	json = json_encode(root);
+	assert_string_equal("[\"a string\",null,null,true,false,3.14]", json);
+	free(json);
+
+	json_free(root);
+}
+
+void encoding_a_list_with_nested_lists(void **state) {
+	char *json;
+	JSONItem *root, *item;
+
+	root = json_create(JSON_LIST);
+
+	item = json_create(JSON_LIST);
+
+	json_list_add_item(item, json_create_string("Hello"));
+
+	json_list_add_item(root, item);
+
+	item = json_create(JSON_LIST);
+
+	json_list_add_item(item, json_create_string("World!"));
+
+	json_list_add_item(root, item);
+
+	json = json_encode(root);
+
+	assert_string_equal("[[\"Hello\"],[\"World!\"]]", json);
+
+	free(json);
+	json_free(root);
+
+}
+
 int main(void) {
 	struct CMUnitTest tests[] = {
 		cmocka_unit_test(encoding_a_null_must_yield_a_null_string),
@@ -129,7 +248,11 @@ int main(void) {
 		cmocka_unit_test(encoding_a_whole_number_outputs_no_decimals),
 		cmocka_unit_test(encoding_a_decimal_number_outputs_decimals),
 		cmocka_unit_test(encoding_a_floating_point_number_includes_trailing_zeroes),
-		cmocka_unit_test(encoding_a_large_floating_point_number_outputs_a_decimal_string)
+		cmocka_unit_test(encoding_a_large_floating_point_number_outputs_a_decimal_string),
+		cmocka_unit_test(encoding_an_empty_list_outputs_brackets_and_null),
+		cmocka_unit_test(encoding_a_list_with_a_single_string_item),
+		cmocka_unit_test(encoding_a_list_with_multiple_string_items),
+		cmocka_unit_test(encoding_a_list_with_nested_lists)
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
