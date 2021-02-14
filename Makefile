@@ -17,7 +17,9 @@ SRCS =\
 	src/number.c \
 	src/object.c \
 	src/list.c \
-	src/json.c
+	src/json.c \
+	src/encode.c \
+	src/decode.c
 
 OBJS = ${SRCS:S/.c/.o/g}
 

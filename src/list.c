@@ -11,6 +11,8 @@ char *json_list_encode(JSONItem *item) {
 
 	char *output = (char *)malloc(3); // default to []\0
 
+	assert(item->type == JSON_LIST);
+
 	output[0] = '[';
 	outlen = 1;
 

@@ -12,6 +12,8 @@ char *json_object_encode(JSONItem *item) {
 
 	char *output = (char *)malloc(3);
 
+	assert(item->type == JSON_OBJECT);
+
 	output[0] = '{';
 	outlen = 1;
 
@@ -56,7 +58,6 @@ void json_object_set(JSONItem *root, char *key, JSONItem *value) {
 	int klen;
 	JSONObject *object, *last, *tmp;
 
-	// Anything but an JSON_OBJECT type here is a programming error
 	assert(root->type == JSON_OBJECT);
 
 	last = object = NULL;
