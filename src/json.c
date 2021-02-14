@@ -3,9 +3,11 @@
 #include <string.h>
 #include <inttypes.h>
 #include <math.h>
-#include <assert.h>
 
 #include "number.h"
+#include "list.h"
+#include "object.h"
+
 #include "json.h"
 
 const char *nullstr = "null";
@@ -17,9 +19,6 @@ const char *boolstr[] = {
 
 char *json_encode(JSONItem *item) {
 	char *output;
-	int outlen, len;
-	char *p;
-	JSONList *list;
 
 	if (item == NULL)
 		item = json_create(JSON_NULL);
@@ -45,38 +44,11 @@ char *json_encode(JSONItem *item) {
 			break;
 
 		case JSON_LIST:
-			output = (char *)malloc(3); // default to []\0
-			output[0] = '[';
-			outlen = 1;
-
-			if (item->value.list != NULL) {
-				list = item->value.list;
-
-				do {
-					p = json_encode(list->item);
-					len = strlen(p);
-
-					// the magic number 2 here is for the , (or ] for the last entry)
-					// and the terminating NULL.
-					output = (char *)realloc(output, outlen + len + 2);
-					memcpy(output+outlen, p, len);
-					outlen += len;
-					output[outlen] = ',';
-					outlen++;
-
-					list = list->next;
-				} while (list != NULL);
-
-				// move back one spot, so the final , will be replaced with a ]
-				outlen--;
-			}
-
-			output[outlen] = ']';
-			output[outlen+1] = '\0';
-
+			output = json_list_encode(item);
 			break;
 
 		case JSON_OBJECT:
+			output = json_object_encode(item);
 			break;
 	}
 
@@ -84,8 +56,6 @@ char *json_encode(JSONItem *item) {
 }
 
 void json_free(JSONItem *item) {
-	JSONList *list, *tmp;
-
 	if (item == NULL)
 		return;
 
@@ -99,16 +69,11 @@ void json_free(JSONItem *item) {
 			break;
 
 		case JSON_LIST:
-			list = item->value.list;
-
-			while (list != NULL) {
-				tmp = list;
-				list = tmp->next;
-				json_free(tmp->item);
-				free(tmp);
-			}
+			json_list_free(item->value.list);
 			break;
+
 		case JSON_OBJECT:
+			json_object_free(item->value.object);
 			break;
 	}
 
@@ -127,27 +92,6 @@ JSONItem *json_create_string(char *string) {
 	item->value.string = (char *)malloc(strlen(string));
 	strcpy(item->value.string, string);
 	return item;
-}
-
-void json_list_add_item(JSONItem *root, JSONItem *item) {
-	JSONList *list, *new;
-
-	assert(root->type == JSON_LIST);
-
-	list = root->value.list;
-	new = (JSONList *)malloc(sizeof(JSONList));
-
-	new->item = item;
-	new->next = NULL;
-
-	if (list == NULL) {
-		root->value.list = new;
-	} else {
-		while (list->next != NULL)
-			list = list->next;
-
-		list->next = new;
-	}
 }
 
 JSONItem *json_decode(char *input) {

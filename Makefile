@@ -15,6 +15,8 @@ PROGRAM = libjson.so
 
 SRCS =\
 	src/number.c \
+	src/object.c \
+	src/list.c \
 	src/json.c
 
 OBJS = ${SRCS:S/.c/.o/g}
