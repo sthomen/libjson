@@ -54,11 +54,10 @@ void json_list_free(JSONList *list) {
 
 void json_list_insert(JSONItem *root, JSONItem *item, int index) {
 	int i;
-	JSONList *last, *list, *target, *new;
+	JSONList *last, *list, *new;
 
 	assert(root->type == JSON_LIST);
 
-	target = NULL;
 	last = NULL;
 	list = root->value.list;
 
@@ -140,14 +139,13 @@ void json_list_delete(JSONItem *root, int index) {
 
 	for (i = 0; list != NULL; i++) {
 		if (i == index) {
-			json_free(list->item);
-
 			if (i == 0) { // last == NULL
 				root->value.list = list->next;
 			} else {
 				last->next = list->next;
 			}
 
+			json_free(list->item);
 			free(list);
 			break;
 		}
