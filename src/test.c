@@ -340,6 +340,8 @@ void counting_a_list_with_multiple_items_yields_the_number_of_items(void **state
 	json_list_add(list, json_create(JSON_NULL));
 
 	assert_int_equal(5, json_list_count(list));
+
+	json_free(list);
 }
 
 void getting_an_item_from_a_list_gets_the_right_item(void **state) {
@@ -365,6 +367,8 @@ void getting_an_item_from_a_list_gets_the_right_item(void **state) {
 	item = json_list_get(list, 3);
 
 	assert_null(item);
+
+	json_free(list);
 }
 
 void deleting_the_first_item_of_a_single_item_list_empties_it(void **state) {
@@ -378,6 +382,8 @@ void deleting_the_first_item_of_a_single_item_list_empties_it(void **state) {
 	assert_null(list->value.list);
 	
 	assert_int_equal(0, json_list_count(list));
+
+	json_free(list);
 }
 
 void deleting_an_intermediate_item_of_a_list_really_deletes_it(void **state) {
@@ -395,6 +401,8 @@ void deleting_an_intermediate_item_of_a_list_really_deletes_it(void **state) {
 	item = json_list_get(list, 1);
 
 	assert_string_equal("c", item->value.string);
+
+	json_free(list);
 }
 
 void inserting_an_item_inserts_the_item_at_the_given_slot(void **state) {
@@ -415,6 +423,8 @@ void inserting_an_item_inserts_the_item_at_the_given_slot(void **state) {
 	item = json_list_get(list, 0);
 
 	assert_string_equal("x", item->value.string);
+
+	json_free(list);
 }
 
 int main(void) {
