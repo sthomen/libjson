@@ -269,36 +269,24 @@ void encoding_an_object_with_a_single_string_item(void **state) {
 	json_free(root);
 }
 
-void encoding_an_object_with_two_string_items(void **state) {
+void encoding_an_object_with_multiple_items_of_multiple_types(void **state) {
 	char *json;
-	JSONItem *root;
+	JSONItem *root, *item;
 
 	root = json_create(JSON_OBJECT);
 
-	json_object_set(root, "test", json_create_string("Hello World!"));
-	json_object_set(root, "test2", json_create_string("Zoot!"));
+	json_object_set(root, "string 1", json_create_string("Hello World!"));
+	json_object_set(root, "string 2", json_create_string("Zoot!"));
+	json_object_set(root, "null value", json_create(JSON_NULL));
+
+	item = json_create(JSON_BOOLEAN);
+	item->value.boolean = 1;
+
+	json_object_set(root, "boolean true", item);
 
 	json = json_encode(root);
 
-	assert_string_equal("{\"test\":\"Hello World!\",\"test2\":\"Zoot!\"}", json);
-
-	free(json);
-	json_free(root);
-}
-
-void encoding_an_object_with_two_values_and_replacing_one(void **state) {
-	char *json;
-	JSONItem *root;
-
-	root = json_create(JSON_OBJECT);
-
-	json_object_set(root, "one", json_create(JSON_NULL));
-	json_object_set(root, "two", json_create_string("The creeper is a spy!"));
-	json_object_set(root, "one", json_create_string("Hello World!"));
-
-	json = json_encode(root);
-
-	assert_string_equal("{\"one\":\"Hello World!\",\"two\":\"The creeper is a spy!\"}", json);
+	assert_string_equal("{\"string 1\":\"Hello World!\",\"string 2\":\"Zoot!\",\"null value\":null,\"boolean true\":true}", json);
 
 	free(json);
 	json_free(root);
@@ -459,8 +447,7 @@ int main(void) {
 		// encoding objects
 		cmocka_unit_test(encoding_a_empty_object_outputs_brackets_and_null),
 		cmocka_unit_test(encoding_an_object_with_a_single_string_item),
-		cmocka_unit_test(encoding_an_object_with_two_string_items),
-		cmocka_unit_test(encoding_an_object_with_two_values_and_replacing_one)
+		cmocka_unit_test(encoding_an_object_with_multiple_items_of_multiple_types),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
