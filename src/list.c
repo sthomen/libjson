@@ -52,23 +52,107 @@ void json_list_free(JSONList *list) {
 	}
 }
 
+void json_list_insert(JSONItem *root, JSONItem *item, int index) {
+	int i;
+	JSONList *last, *list, *target, *new;
+
+	assert(root->type == JSON_LIST);
+
+	target = NULL;
+	last = NULL;
+	list = root->value.list;
+
+	new = (JSONList *)malloc(sizeof(JSONList));
+	new->item = item;
+	new->next = NULL;
+
+	for (i = 0; list != NULL; i++) {
+		if (i == index) {
+			break;
+		}
+
+		last = list;
+		list = list->next;
+	}
+
+	if (last == NULL) {
+		last = root->value.list;
+		root->value.list = new;
+		new->next = last;
+	} else {
+		if (last->next != NULL)
+			new->next = last->next;
+
+		last->next = new;
+	}
+}
+
 void json_list_add(JSONItem *root, JSONItem *item) {
-	JSONList *list, *new;
+	json_list_insert(root, item, JSON_LIST_LAST);
+}
+
+int json_list_count(JSONItem *root) {
+	int result = 0;
+	JSONList *list;
 
 	assert(root->type == JSON_LIST);
 
 	list = root->value.list;
-	new = (JSONList *)malloc(sizeof(JSONList));
 
-	new->item = item;
-	new->next = NULL;
+	while (list != NULL) {
+		result++;
+		list = list->next;
+	}
 
-	if (list == NULL) {
-		root->value.list = new;
-	} else {
-		while (list->next != NULL)
-			list = list->next;
+	return result;
+}
 
-		list->next = new;
+JSONItem *json_list_get(JSONItem *root, int index) {
+	int i;
+	JSONList *list;
+	JSONItem *item;
+
+	assert(root->type == JSON_LIST);
+
+	list = root->value.list;
+	item = NULL;
+
+	for (i = 0; list != NULL; i++) {
+		if (i == index) {
+			item = list->item;
+			break;
+		}
+
+		list = list->next;
+	}
+
+	return item;
+}
+
+void json_list_delete(JSONItem *root, int index) {
+	int i;
+	JSONList *list, *last;
+
+	assert(root->type == JSON_LIST);
+
+	last = NULL;
+	list = root->value.list;
+
+	for (i = 0; list != NULL; i++) {
+		if (i == index) {
+			json_free(list->item);
+
+			if (i == 0) { // last == NULL
+				root->value.list = list->next;
+			} else {
+				last->next = list->next;
+			}
+
+			free(list);
+			break;
+		}
+
+		last = list;
+		list = list->next;
 	}
 }
