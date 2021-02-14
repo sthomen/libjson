@@ -112,3 +112,32 @@ JSONItem *json_object_get(JSONItem *root, char *key) {
 
 	return NULL;
 }
+
+void json_object_delete(JSONItem *root, char *key) {
+	int i;
+	JSONObject *object, *last;
+
+	assert(root->type == JSON_OBJECT);
+
+	last = NULL;
+	object = root->value.object;
+
+	for (i = 0; object != NULL; i++) {
+		if (strcmp(object->key, key) == 0) {
+			if (last == NULL) {
+				root->value.object = object->next;
+			} else {
+				last->next = object->next;
+			}
+
+			json_free(object->value);
+			free(object->key);
+			free(object);
+			break;
+		}
+
+		last = object;
+		object = object->next;
+	}
+
+}

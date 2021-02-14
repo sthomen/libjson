@@ -415,6 +415,39 @@ void inserting_an_item_inserts_the_item_at_the_given_slot(void **state) {
 	json_free(list);
 }
 
+void replacing_the_first_item_in_an_object_actually_replaces_it(void **state) {
+	JSONItem *object, *item;
+
+	object = json_create(JSON_OBJECT);
+
+	json_object_set(object, "one", json_create(JSON_NULL));
+	json_object_set(object, "two", json_create_string("The creeper is a spy!"));
+	json_object_set(object, "one", json_create_string("Hello World!"));
+
+	item = json_object_get(object, "one");
+
+	assert_non_null(item);
+
+	assert_int_equal(JSON_STRING, item->type);
+
+	json_free(object);
+}
+
+void deleting_an_item_in_an_object_makes_it_unavailable(void **state) {
+	JSONItem *object;
+
+	object = json_create(JSON_OBJECT);
+	json_object_set(object, "foo", json_create_string("bar"));
+
+	assert_non_null(json_object_get(object, "foo"));
+
+	json_object_delete(object, "foo");
+
+	assert_null(json_object_get(object, "foo"));
+
+	json_free(object);
+}
+
 int main(void) {
 	struct CMUnitTest tests[] = {
 		// lists
@@ -425,6 +458,10 @@ int main(void) {
 		cmocka_unit_test(deleting_the_first_item_of_a_single_item_list_empties_it),
 		cmocka_unit_test(deleting_an_intermediate_item_of_a_list_really_deletes_it),
 		cmocka_unit_test(inserting_an_item_inserts_the_item_at_the_given_slot),
+
+		// objects
+		cmocka_unit_test(replacing_the_first_item_in_an_object_actually_replaces_it),
+		cmocka_unit_test(deleting_an_item_in_an_object_makes_it_unavailable),
 
 		// encoding, base items
 		cmocka_unit_test(encoding_a_null_must_yield_a_null_string),
