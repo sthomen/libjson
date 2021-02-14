@@ -35,24 +35,24 @@ struct json_object {
 	JSONObject *next;
 };
 
-JSONItem *json_decode(char *input);
-char *json_encode(JSONItem *root);
+JSONItem *json_decode(char *);
+char *json_encode(JSONItem *);
 
-JSONItem *json_create(enum json_types type);
-JSONItem *json_create_string(char *string);
+JSONItem *json_create(enum json_types);
+JSONItem *json_create_string(char *);
 
 #define JSON_LIST_LAST -1
 
-void json_list_add(JSONItem *root, JSONItem *item);
-void json_list_insert(JSONItem *root, JSONItem *item, int index);
-void json_list_delete(JSONItem *root, int index);
-int json_list_count(JSONItem *root);
-JSONItem *json_list_get(JSONItem *root, int index);
+void json_list_add(JSONItem *, JSONItem *);
+void json_list_insert(JSONItem *, JSONItem *, int);
+void json_list_delete(JSONItem *, int);
+int json_list_count(JSONItem *);
+JSONItem *json_list_get(JSONItem *, int);
 
-void json_object_set(JSONItem *root, char *key, JSONItem *value);
-JSONItem *json_object_get(JSONItem *root, char *key);
-void json_object_delete(JSONItem *root, char *key);
+void json_object_set(JSONItem *, char *, JSONItem *);
+JSONItem *json_object_get(JSONItem *, char *);
+void json_object_delete(JSONItem *, char *);
 
-void json_free(JSONItem *item);
+void json_free(JSONItem *);
 
 #endif /* _JSON_H_ */
