@@ -23,12 +23,12 @@ char *json_encode(JSONItem *item) {
 
 	switch (item->type) {
 		case JSON_NULL:
-			output = (char *)malloc(strlen(nullstr));
+			output = (char *)malloc(strlen(nullstr) + 1);
 			strcpy(output, nullstr);
 			break;
 
 		case JSON_BOOLEAN:
-			output = (char *)malloc(strlen(boolstr[item->value.boolean]));
+			output = (char *)malloc(strlen(boolstr[item->value.boolean]) + 1);
 			strcpy(output, boolstr[item->value.boolean]);
 			break;
 
@@ -37,7 +37,7 @@ char *json_encode(JSONItem *item) {
 			break;
 
 		case JSON_STRING:
-			output = (char *)malloc(strlen(item->value.string) + 2);
+			output = (char *)malloc(strlen(item->value.string) + 3);
 			sprintf(output, "\"%s\"", item->value.string);
 			break;
 

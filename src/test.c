@@ -9,7 +9,11 @@
 #include "json.h"
 
 void encoding_a_null_must_yield_a_null_string(void **state) {
-	assert_string_equal("null", json_encode(NULL));
+	char *json = json_encode(NULL);
+
+	assert_string_equal("null", json);
+
+	free(json);
 }
 
 void encoding_an_explicit_null_item_must_also_yield_a_null_string(void **state) {
