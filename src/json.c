@@ -15,8 +15,12 @@ JSONItem *json_create(enum json_types type) {
 
 JSONItem *json_create_string(char *string) {
 	JSONItem *item = json_create(JSON_STRING);
-	item->value.string = (char *)malloc(strlen(string));
-	strcpy(item->value.string, string);
+
+	if (string != NULL) {
+		item->value.string = (char *)malloc(strlen(string));
+		strcpy(item->value.string, string);
+	}
+
 	return item;
 }
 

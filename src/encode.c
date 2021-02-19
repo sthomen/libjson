@@ -37,8 +37,13 @@ char *json_encode(JSONItem *item) {
 			break;
 
 		case JSON_STRING:
-			output = (char *)malloc(strlen(item->value.string) + 3);
-			sprintf(output, "\"%s\"", item->value.string);
+			if (item->value.string == NULL) {
+				output = (char *)malloc(3);
+				sprintf(output, "\"\"");
+			} else {
+				output = (char *)malloc(strlen(item->value.string) + 3);
+				sprintf(output, "\"%s\"", item->value.string);
+			}
 			break;
 
 		case JSON_LIST:
