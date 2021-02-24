@@ -30,6 +30,7 @@ void json_free(JSONItem *item) {
 
 	switch (item->type) {
 		case JSON_NULL:
+		case JSON_BOOLEAN:
 		case JSON_NUMBER:
 			break;
 
