@@ -24,6 +24,20 @@ JSONItem *json_create_string(char *string) {
 	return item;
 }
 
+JSONItem *json_create_boolean(unsigned int value) {
+	JSONItem *item = json_create(JSON_BOOLEAN);
+
+	item->value.boolean = (value > 0 ? 1 : 0);
+	return item;
+}
+
+JSONItem *json_create_number(double value) {
+	JSONItem *item = json_create(JSON_NUMBER);
+
+	item->value.number = value;
+	return item;
+}
+
 void json_free(JSONItem *item) {
 	if (item == NULL)
 		return;
