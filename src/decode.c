@@ -25,14 +25,6 @@ static const struct {
 	{ NULL,                        TOK_INVALID }
 };
 
-// FIXME this construct requires C99 and this library could be C89
-static const char whitespace[256] = {
-	[' '] = 1,
-	['\n'] = 1,
-	['\t'] = 1,
-	['\r'] = 1
-};
-
 #include "grammar.c"
 
 int regmatch(char *pattern, char *string) {
@@ -62,8 +54,7 @@ int tok(char **in, int *toklen) {
 	int i;
 
 	// skip any whitespace before the token
-	while (**in && whitespace[**in])
-		(*in)++;
+	while ((**in == ' ' || **in == '\n' || **in == '\r' || **in == '\t') && (**in)++);
 
 	// end at NULL
 	if (**in == 0)
@@ -123,6 +114,5 @@ JSONItem *json_decode(char *input) {
 	}
 
 	return root;
-
 }
 
