@@ -68,6 +68,21 @@ int tok(char **in, int *toklen) {
 	return TOK_INVALID;
 }
 
+/*
+ * IRIX doesn't have a strndup function, so here's a homemade one
+ */
+char *dup(char *str, size_t len) {
+	char *out = (char *)malloc(len+1);
+
+	if (!out)
+		return NULL;
+
+	memcpy(out, str, len);
+	out[len] = '\0';
+
+	return out;
+}
+
 JSONItem *json_decode(char *input) {
 	void *parser;
 	char *p, *ttext;
@@ -90,9 +105,9 @@ JSONItem *json_decode(char *input) {
 
 			// don't include the quotes in strings
 			if (token == TOK_STRING) {
-				ttext = strndup(p+1, toklen-2);
+				ttext = dup(p+1, toklen-2);
 			} else {
-				ttext = strndup(p, toklen);
+				ttext = dup(p, toklen);
 			}
 			
 			if (!ttext)
