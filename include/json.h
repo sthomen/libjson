@@ -57,4 +57,6 @@ void json_object_delete(JSONItem *, char *);
 
 void json_free(JSONItem *);
 
+void json_dump(JSONItem *);
+
 #endif /* _JSON_H_ */
