@@ -577,6 +577,190 @@ void encoding_an_object_with_multiple_items_of_multiple_types(void **state) {
 	json_free(root);
 }
 
+void given_an_invalid_token_decode_should_stop_and_return_NULL(void **state) {
+	JSONItem *item = json_decode("foobar");
+	
+	assert_null(item);
+}
+
+void given_an_empty_string_decode_should_stop_and_return_NULL(void **state) {
+	JSONItem *item = json_decode("");
+
+	assert_null(item);
+}
+
+void given_a_literal_null_decode_should_produce_a_JSON_NULL_object(void **state) {
+	JSONItem *item;
+
+	item = json_decode("null");
+
+	assert_non_null(item);
+
+	// NOTE: This might have false positives since JSON_NULL could be
+	// defined as 0 by it being the first enum item
+	assert_int_equal(item->type, JSON_NULL);
+	json_free(item);
+}
+
+void given_a_json_number_decode_should_produce_a_JSON_NUMBER_object(void **state) {
+	JSONItem *item;
+
+	item = json_decode("1");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_NUMBER);
+	assert_float_equal(1.0, (float)item->value.number, 0.0);
+	json_free(item);
+
+	item = json_decode("1234");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_NUMBER);
+	assert_float_equal(1234.0, (float)item->value.number, 0.0);
+	json_free(item);
+
+	item = json_decode("12.34");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_NUMBER);
+	assert_float_equal(12.34, (float)item->value.number, 0.01);
+	json_free(item);
+
+	item = json_decode("-42");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_NUMBER);
+	assert_float_equal(-42.0, (float)item->value.number, 0.0);
+	json_free(item);
+
+	item = json_decode("+42.5");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_NUMBER);
+	assert_float_equal(42.5, (float)item->value.number, 0.01);
+	json_free(item);
+}
+
+void given_a_json_string_decode_should_produce_a_JSON_STRING_object(void **state) {
+	JSONItem *item;
+
+	item = json_decode("\"hello world\"");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_STRING);
+	assert_string_equal("hello world", item->value.string);
+	json_free(item);
+}
+
+void given_a_json_string_with_an_escaped_quote_decode_should_produce_a_JSON_STRING_object_with_the_entire_string(void **state) {
+	JSONItem *item;
+
+	item = json_decode("\"hello \\\"world\"");
+
+	assert_non_null(item);
+	assert_int_equal(item->type, JSON_STRING);
+	assert_string_equal("hello \\\"world", item->value.string);
+	json_free(item);
+}
+
+void given_json_with_an_empty_list_decode_should_produce_an_empty_JSON_LIST_object(void **state) {
+	JSONItem *item = json_decode("[]");
+
+	assert_non_null(item);
+
+	assert_int_equal(JSON_LIST, item->type);
+	assert_int_equal(0, json_list_count(item));
+	json_free(item);
+}
+
+void given_json_with_an_empty_object_decode_should_produce_an_empty_JSON_OBJECT_object(void **state) {
+	JSONItem *item = json_decode("{}");
+
+	assert_non_null(item);
+
+	assert_int_equal(JSON_OBJECT, item->type);
+	assert_null(item->value.object);
+	json_free(item);
+	
+}
+
+void given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_with_the_items(void **state) {
+	JSONItem *item;
+	JSONItem *list = json_decode(
+"["
+"   null,"
+"	true,"
+"   false,"
+"	1.23,"
+"	\"hello\""
+"]"
+);
+
+	assert_non_null(list);
+
+	assert_int_equal(JSON_LIST, list->type);
+	assert_int_equal(5, json_list_count(list));
+
+	item = json_list_get(list, 0);
+	assert_int_equal(JSON_NULL, item->type);
+
+	item = json_list_get(list, 1);
+	assert_int_equal(JSON_BOOLEAN, item->type);
+	assert_int_equal(1, item->value.boolean);
+
+	item = json_list_get(list, 2);
+	assert_int_equal(JSON_BOOLEAN, item->type);
+	assert_int_equal(0, item->value.boolean);
+
+	item = json_list_get(list, 3);
+	assert_int_equal(JSON_NUMBER, item->type);
+	assert_float_equal(1.23, (float)item->value.number, 0.0);
+
+	item = json_list_get(list, 4);
+	assert_int_equal(JSON_STRING, item->type);
+	assert_string_equal("hello", item->value.string);
+
+	json_free(list);
+}
+
+void given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items(void **state) {
+	JSONItem *item;
+	JSONItem *object = json_decode(
+"{"
+"	\"first\": null,"
+"   \"second\": true,"
+"   \"third\": false,"
+"	\"fourth\": 1.23,"
+"	\"fifth\": \"hello\""
+"}"
+);
+
+	assert_non_null(object);
+	assert_int_equal(JSON_OBJECT, object->type);
+
+	item = json_object_get(object, "first");
+	assert_int_equal(JSON_NULL, item->type);
+
+	item = json_object_get(object, "second");
+	assert_int_equal(JSON_BOOLEAN, item->type);
+	assert_int_equal(1, item->value.boolean);
+
+	item = json_object_get(object, "third");
+	assert_int_equal(JSON_BOOLEAN, item->type);
+	assert_int_equal(0, item->value.boolean);
+
+	item = json_object_get(object, "fourth");
+	assert_int_equal(JSON_NUMBER, item->type);
+	assert_float_equal(1.23, (float)item->value.number, 0.0);
+
+	item = json_object_get(object, "fifth");
+	assert_int_equal(JSON_STRING, item->type);
+	assert_string_equal("hello", item->value.string);
+
+	json_free(object);
+	
+}
+
 int main(void) {
 	struct CMUnitTest tests[] = {
 		// encoding, basic values
@@ -624,7 +808,20 @@ int main(void) {
 		cmocka_unit_test(encoding_a_empty_object_outputs_brackets_and_null),
 		cmocka_unit_test(encoding_an_object_with_a_single_string_item),
 		cmocka_unit_test(encoding_an_object_with_multiple_items_of_multiple_types),
+
+		// decoding objects
+		cmocka_unit_test(given_an_empty_string_decode_should_stop_and_return_NULL),
+		cmocka_unit_test(given_an_invalid_token_decode_should_stop_and_return_NULL),
+		cmocka_unit_test(given_a_literal_null_decode_should_produce_a_JSON_NULL_object),
+		cmocka_unit_test(given_a_json_number_decode_should_produce_a_JSON_NUMBER_object),
+		cmocka_unit_test(given_a_json_string_decode_should_produce_a_JSON_STRING_object),
+		cmocka_unit_test(given_json_with_an_empty_list_decode_should_produce_an_empty_JSON_LIST_object),
+		cmocka_unit_test(given_json_with_an_empty_object_decode_should_produce_an_empty_JSON_OBJECT_object),
+		cmocka_unit_test(given_a_json_string_with_an_escaped_quote_decode_should_produce_a_JSON_STRING_object_with_the_entire_string),
+		cmocka_unit_test(given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_with_the_items),
+		cmocka_unit_test(given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items)
 	};
+		
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

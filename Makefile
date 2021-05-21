@@ -2,6 +2,8 @@
 
 CC ?= cc
 
+LEMON ?= lemon
+
 CCARGS ?= -fPIC
 CFLAGS += $(CCARGS) -Iinclude
 
@@ -26,12 +28,18 @@ OBJS = ${SRCS:S/.c/.o/g}
 $(PROGRAM): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
+src/decode.o: src/grammar.c
+
+src/grammar.c: src/grammar.y
+	$(LEMON) $<
+
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	$(RM) $(PROGRAM)
 	$(RM) $(OBJS)
+	$(RM) src/grammar.c src/grammar.h src/grammar.out
 	$(RM) test
 
 install:
