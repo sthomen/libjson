@@ -16,7 +16,9 @@
  ************************************************************************/
 
 void encoding_a_NULL_outputs_a_null_string(void **state) {
-	char *json = json_encode(NULL);
+	char *json;
+
+	json = json_encode(NULL);
 
 	assert_string_equal("null", json);
 
@@ -24,10 +26,11 @@ void encoding_a_NULL_outputs_a_null_string(void **state) {
 }
 
 void encoding_a_null_object_outputs_a_null_string(void **state) {
-	JSONItem *item = json_create(JSON_NULL);
+	JSONItem *item;
+	char *json;
 
-	char *json = json_encode(item);
-	
+	item = json_create(JSON_NULL);
+	json = json_encode(item);
 	assert_string_equal("null", json);
 
 	free(json);
@@ -39,10 +42,11 @@ void encoding_a_null_object_outputs_a_null_string(void **state) {
  ************************************************************************/
 
 void encoding_a_boolean_outputs_true_for_1_and_false_for_0(void **state) {
-	JSONItem *item = json_create(JSON_BOOLEAN);
+	JSONItem *item;
 	char *json;
 
-	// true
+	item = json_create(JSON_BOOLEAN);
+	/* true */
 
 	item->value.boolean = 1;
 
@@ -52,7 +56,7 @@ void encoding_a_boolean_outputs_true_for_1_and_false_for_0(void **state) {
 
 	free(json);
 
-	// false
+	/* false */
 
 	item->value.boolean = 0;
 
@@ -69,7 +73,9 @@ void encoding_a_boolean_outputs_true_for_1_and_false_for_0(void **state) {
  ************************************************************************/
 
 void given_a_string_json_create_string_creates_a_string_object(void **state) {
-	JSONItem *item = json_create_string("string");
+	JSONItem *item;
+
+	item = json_create_string("string");
 
 	assert_int_equal(JSON_STRING, item->type);
 	assert_string_equal("string", item->value.string);
@@ -78,7 +84,9 @@ void given_a_string_json_create_string_creates_a_string_object(void **state) {
 }
 
 void given_a_NULL_json_create_string_creates_an_empty_string_object(void **state) {
-	JSONItem *item = json_create_string(NULL);
+	JSONItem *item;
+
+	item = json_create_string(NULL);
 
 	assert_int_equal(JSON_STRING, item->type);
 	assert_null(item->value.string);
@@ -118,11 +126,14 @@ void encoding_a_string_item_includes_quotes(void **state) {
  ************************************************************************/
 
 void encoding_a_whole_number_outputs_no_decimals(void **state) {
-	JSONItem *item = json_create(JSON_NUMBER);
+	JSONItem *item;
+	char *json;
+
+	item = json_create(JSON_NUMBER);
 	
 	item->value.number = 42.0;
 
-	char *json = json_encode(item);
+	json = json_encode(item);
 
 	assert_string_equal("42", json);
 
@@ -131,11 +142,14 @@ void encoding_a_whole_number_outputs_no_decimals(void **state) {
 }
 
 void encoding_a_decimal_number_outputs_decimals(void **state) {
-	JSONItem *item = json_create(JSON_NUMBER);
+	JSONItem *item;
+	char *json;
+
+	item = json_create(JSON_NUMBER);
 	
 	item->value.number = 4.2;
 
-	char *json = json_encode(item);
+	json = json_encode(item);
 
 	assert_string_equal("4.2", json);
 
@@ -144,11 +158,12 @@ void encoding_a_decimal_number_outputs_decimals(void **state) {
 }
 
 void encoding_a_floating_point_number_includes_trailing_zeroes(void **state) {
+	JSONItem *item;
 	char *json;
 
-	skip(); // this doesn't happen and can't while number_to_string uses sprintf
+	skip(); /* this doesn't happen and can't while number_to_string uses sprintf */
 
-	JSONItem *item = json_create(JSON_NUMBER);
+	item = json_create(JSON_NUMBER);
 	
 	item->value.number = 4.20;
 
@@ -161,11 +176,12 @@ void encoding_a_floating_point_number_includes_trailing_zeroes(void **state) {
 }
 
 void encoding_a_large_floating_point_number_outputs_a_decimal_string(void **state) {
+	JSONItem *item;
 	char *json;
 
-	skip(); // we can't guarantee anything about the output from number_to_string here
+	skip(); /* we can't guarantee anything about the output from number_to_string here */
 
-	JSONItem *item = json_create(JSON_NUMBER);
+	item = json_create(JSON_NUMBER);
 	
 	item->value.number = 1234123.1234567;
 
@@ -187,8 +203,10 @@ void adding_an_item_to_an_empty_list_makes_it_contain_the_item(void **state) {
 	list = json_create(JSON_LIST);
 	json_list_add(list, json_create(JSON_NULL));
 
-	// these two asserts interrogate the object internals so as not to depend on
-	// json_list_count and json_list_get working
+	/*
+	 * these two asserts interrogate the object internals so as not to depend on
+	 * json_list_count and json_list_get working
+	 */
 
 	assert_non_null(list->value.list);
 	assert_int_equal(list->value.list->item->type, JSON_NULL);
@@ -324,8 +342,9 @@ void inserting_an_item_at_position_0_prepends_it_to_the_list(void **state) {
 
 void encoding_an_empty_list_outputs_brackets_and_null(void **state) {
 	char *json;
-	JSONItem *item = json_create(JSON_LIST);
+	JSONItem *item;
 
+	item = json_create(JSON_LIST);
 	json = json_encode(item);
 
 	assert_string_equal("[]", json);
@@ -336,108 +355,111 @@ void encoding_an_empty_list_outputs_brackets_and_null(void **state) {
 
 void encoding_a_list_with_a_single_string_item(void **state) {
 	char *json;
-	JSONItem *item = json_create(JSON_LIST);
-	JSONItem *new = json_create_string("Hello!");
-	json_list_add(item, new);
+	JSONItem *list, *new;
 
-	json = json_encode(item);
+	list = json_create(JSON_LIST);
+	new = json_create_string("Hello!");
+
+	json_list_add(list, new);
+
+	json = json_encode(list);
 
 	assert_string_equal("[\"Hello!\"]", json);
 	
 	free(json);
-	json_free(item);
+	json_free(list);
 }
 
 void encoding_a_list_with_multiple_string_items(void **state) {
 	char *json;
-	JSONItem *root, *item;
+	JSONItem *list;
 
-	root = json_create(JSON_LIST);
-	json_list_add(root, json_create_string("Hello"));
-	json_list_add(root, json_create_string("World!"));
+	list = json_create(JSON_LIST);
+	json_list_add(list, json_create_string("Hello"));
+	json_list_add(list, json_create_string("World!"));
 
-	json = json_encode(root);
+	json = json_encode(list);
 
 	assert_string_equal("[\"Hello\",\"World!\"]", json);
 	
 	free(json);
-	json_free(root);
+	json_free(list);
 }
 
 void encoding_a_list_with_all_bare_types(void **state) {
 	char *json;
-	JSONItem *root, *item;
+	JSONItem *list, *item;
 
-	root = json_create(JSON_LIST);
-	json_list_add(root, json_create_string("a string"));
+	list = json_create(JSON_LIST);
+	json_list_add(list, json_create_string("a string"));
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\"]", json);
 	free(json);
 
-	json_list_add(root, json_create(JSON_NULL));
+	json_list_add(list, json_create(JSON_NULL));
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\",null]", json);
 	free(json);
 
-	json_list_add(root, NULL);
+	json_list_add(list, NULL);
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\",null,null]", json);
 	free(json);
 
 	item = json_create(JSON_BOOLEAN);
 	item->value.boolean = 1;
-	json_list_add(root, item);
+	json_list_add(list, item);
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\",null,null,true]", json);
 	free(json);
 
 	item = json_create(JSON_BOOLEAN);
 	item->value.boolean = 0;
-	json_list_add(root, item);
+	json_list_add(list, item);
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\",null,null,true,false]", json);
 	free(json);
 
 	item = json_create(JSON_NUMBER);
 	item->value.number = 3.14;
-	json_list_add(root, item);
+	json_list_add(list, item);
 
-	json = json_encode(root);
+	json = json_encode(list);
 	assert_string_equal("[\"a string\",null,null,true,false,3.14]", json);
 	free(json);
 
-	json_free(root);
+	json_free(list);
 }
 
 void encoding_a_list_with_nested_lists(void **state) {
 	char *json;
-	JSONItem *root, *item;
+	JSONItem *list, *item;
 
-	root = json_create(JSON_LIST);
+	list = json_create(JSON_LIST);
 
 	item = json_create(JSON_LIST);
 
 	json_list_add(item, json_create_string("Hello"));
 
-	json_list_add(root, item);
+	json_list_add(list, item);
 
 	item = json_create(JSON_LIST);
 
 	json_list_add(item, json_create_string("World!"));
 
-	json_list_add(root, item);
+	json_list_add(list, item);
 
-	json = json_encode(root);
+	json = json_encode(list);
 
 	assert_string_equal("[[\"Hello\"],[\"World!\"]]", json);
 
 	free(json);
-	json_free(root);
+	json_free(list);
 }
 
 /*************************************************************************
@@ -445,7 +467,9 @@ void encoding_a_list_with_nested_lists(void **state) {
  ************************************************************************/
 
 void getting_an_item_from_an_empty_object_returns_null(void **state) {
-	JSONItem *object = json_create(JSON_OBJECT);
+	JSONItem *object;
+
+	object = json_create(JSON_OBJECT);
 
 	assert_null(json_object_get(object, "something"));
 
@@ -459,15 +483,15 @@ void setting_an_item_in_an_empty_object_results_in_an_object_with_the_item(void 
 
 	json_object_set(object, "item", json_create(JSON_NULL));
 
-	// there is SOMETHING there
+	/* there is SOMETHING there */
 	assert_non_null(object->value.object);
 
 	item = json_object_get(object, "item");
 
-	// the thing we put there, is there!
+	/* the thing we put there, is there! */
 	assert_non_null(item);
 
-	// it's the right type
+	/* it's the right type */
 	assert_int_equal(JSON_NULL, item->type);
 
 	json_free(object);
@@ -526,65 +550,69 @@ void deleting_an_item_in_an_object_properly_unlinks_it(void **state) {
 
 void encoding_a_empty_object_outputs_brackets_and_null(void **state) {
 	char *json;
-	JSONItem *root;
+	JSONItem *object;
 
-	root = json_create(JSON_OBJECT);
+	object = json_create(JSON_OBJECT);
 
-	json = json_encode(root);
+	json = json_encode(object);
 
 	assert_string_equal("{}", json);
 
 	free(json);
-	json_free(root);
+	json_free(object);
 }
 
 void encoding_an_object_with_a_single_string_item(void **state) {
 	char *json;
-	JSONItem *root;
+	JSONItem *object;
 
-	root = json_create(JSON_OBJECT);
+	object = json_create(JSON_OBJECT);
 
-	json_object_set(root, "test", json_create_string("Hello World!"));
+	json_object_set(object, "test", json_create_string("Hello World!"));
 
-	json = json_encode(root);
+	json = json_encode(object);
 
 	assert_string_equal("{\"test\":\"Hello World!\"}", json);
 
 	free(json);
-	json_free(root);
+	json_free(object);
 }
 
 void encoding_an_object_with_multiple_items_of_multiple_types(void **state) {
 	char *json;
-	JSONItem *root, *item;
+	JSONItem *object, *item;
 
-	root = json_create(JSON_OBJECT);
+	object = json_create(JSON_OBJECT);
 
-	json_object_set(root, "string 1", json_create_string("Hello World!"));
-	json_object_set(root, "string 2", json_create_string("Zoot!"));
-	json_object_set(root, "null value", json_create(JSON_NULL));
+	json_object_set(object, "string 1", json_create_string("Hello World!"));
+	json_object_set(object, "string 2", json_create_string("Zoot!"));
+	json_object_set(object, "null value", json_create(JSON_NULL));
 
 	item = json_create(JSON_BOOLEAN);
 	item->value.boolean = 1;
 
-	json_object_set(root, "boolean true", item);
+	json_object_set(object, "boolean true", item);
 
-	json = json_encode(root);
+	json = json_encode(object);
 
 	assert_string_equal("{\"string 1\":\"Hello World!\",\"string 2\":\"Zoot!\",\"null value\":null,\"boolean true\":true}", json);
 
 	free(json);
-	json_free(root);
+	json_free(object);
 }
 
 void given_an_invalid_token_decode_should_stop_and_return_NULL(void **state) {
-	JSONItem *item = json_decode("foobar");
+	JSONItem *item;
+
+	item = json_decode("foobar");
 	
 	assert_null(item);
 }
 
 void given_an_empty_string_decode_should_stop_and_return_NULL(void **state) {
-	JSONItem *item = json_decode("");
+	JSONItem *item;
+
+	item = json_decode("");
 
 	assert_null(item);
 }
@@ -596,8 +624,10 @@ void given_a_literal_null_decode_should_produce_a_JSON_NULL_object(void **state)
 
 	assert_non_null(item);
 
-	// NOTE: This might have false positives since JSON_NULL could be
-	// defined as 0 by it being the first enum item
+	/*
+	 * NOTE: This might have false positives since JSON_NULL could be
+	 * defined as 0 by it being the first enum item
+	 */
 	assert_int_equal(item->type, JSON_NULL);
 	json_free(item);
 }
@@ -664,7 +694,9 @@ void given_a_json_string_with_an_escaped_quote_decode_should_produce_a_JSON_STRI
 }
 
 void given_json_with_an_empty_list_decode_should_produce_an_empty_JSON_LIST_object(void **state) {
-	JSONItem *item = json_decode("[]");
+	JSONItem *item;
+
+	item = json_decode("[]");
 
 	assert_non_null(item);
 
@@ -674,7 +706,9 @@ void given_json_with_an_empty_list_decode_should_produce_an_empty_JSON_LIST_obje
 }
 
 void given_json_with_an_empty_object_decode_should_produce_an_empty_JSON_OBJECT_object(void **state) {
-	JSONItem *item = json_decode("{}");
+	JSONItem *item;
+
+	item = json_decode("{}");
 
 	assert_non_null(item);
 
@@ -686,7 +720,9 @@ void given_json_with_an_empty_object_decode_should_produce_an_empty_JSON_OBJECT_
 
 void given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_with_the_items(void **state) {
 	JSONItem *item;
-	JSONItem *list = json_decode(
+	JSONItem *list;
+
+	list = json_decode(
 "["
 "   null,"
 "	true,"
@@ -725,7 +761,9 @@ void given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_wi
 
 void given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items(void **state) {
 	JSONItem *item;
-	JSONItem *object = json_decode(
+	JSONItem *object;
+
+	object = json_decode(
 "{"
 "	\"first\": null,"
 "   \"second\": true,"
@@ -763,25 +801,25 @@ void given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_
 
 int main(void) {
 	struct CMUnitTest tests[] = {
-		// encoding, basic values
+		/* encoding, basic values */
 		cmocka_unit_test(encoding_a_NULL_outputs_a_null_string),
 		cmocka_unit_test(encoding_a_null_object_outputs_a_null_string),
 		cmocka_unit_test(encoding_a_boolean_outputs_true_for_1_and_false_for_0),
 
-		// encoding, strings
-		// TODO This needs a lot more tests, including encoding, high bytes etc.
+		/* encoding, strings */
+		/* TODO This needs a lot more tests, including encoding, high bytes etc. */
 		cmocka_unit_test(given_a_string_json_create_string_creates_a_string_object),
 		cmocka_unit_test(given_a_NULL_json_create_string_creates_an_empty_string_object),
 		cmocka_unit_test(encoding_a_NULL_value_string_outputs_an_empty_string),
 		cmocka_unit_test(encoding_a_string_item_includes_quotes),
 
-		// encoding, numbers
+		/* encoding, numbers */
 		cmocka_unit_test(encoding_a_whole_number_outputs_no_decimals),
 		cmocka_unit_test(encoding_a_decimal_number_outputs_decimals),
 		cmocka_unit_test(encoding_a_floating_point_number_includes_trailing_zeroes),
 		cmocka_unit_test(encoding_a_large_floating_point_number_outputs_a_decimal_string),
 
-		// lists
+		/* lists */
 		cmocka_unit_test(adding_an_item_to_an_empty_list_makes_it_contain_the_item),
 		cmocka_unit_test(adding_an_item_to_a_list_makes_the_count_go_from_zero_to_one),
 		cmocka_unit_test(counting_a_list_with_multiple_items_outputs_the_number_of_items),
@@ -791,25 +829,25 @@ int main(void) {
 		cmocka_unit_test(inserting_an_item_inserts_the_item_at_the_right_index),
 		cmocka_unit_test(inserting_an_item_at_position_0_prepends_it_to_the_list),
 
-		// encoding lists
+		/* encoding lists */
 		cmocka_unit_test(encoding_an_empty_list_outputs_brackets_and_null),
 		cmocka_unit_test(encoding_a_list_with_a_single_string_item),
 		cmocka_unit_test(encoding_a_list_with_multiple_string_items),
 		cmocka_unit_test(encoding_a_list_with_nested_lists),
 
-		// objects
+		/* objects */
 		cmocka_unit_test(getting_an_item_from_an_empty_object_returns_null),
 		cmocka_unit_test(setting_an_item_in_an_empty_object_results_in_an_object_with_the_item),
 		cmocka_unit_test(replacing_an_item_in_an_object_replaces_the_item),
 		cmocka_unit_test(replacing_the_first_item_in_an_object_retains_the_other_items),
 		cmocka_unit_test(deleting_an_item_in_an_object_properly_unlinks_it),
 
-		// encoding objects
+		/* encoding objects */
 		cmocka_unit_test(encoding_a_empty_object_outputs_brackets_and_null),
 		cmocka_unit_test(encoding_an_object_with_a_single_string_item),
 		cmocka_unit_test(encoding_an_object_with_multiple_items_of_multiple_types),
 
-		// decoding objects
+		/* decoding objects */
 		cmocka_unit_test(given_an_empty_string_decode_should_stop_and_return_NULL),
 		cmocka_unit_test(given_an_invalid_token_decode_should_stop_and_return_NULL),
 		cmocka_unit_test(given_a_literal_null_decode_should_produce_a_JSON_NULL_object),

@@ -35,7 +35,7 @@ struct json_object {
 	JSONObject *next;
 };
 
-JSONItem *json_decode(char *);
+JSONItem *json_decode(const char *);
 char *json_encode(JSONItem *);
 
 JSONItem *json_create(enum json_types);

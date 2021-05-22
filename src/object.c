@@ -21,7 +21,7 @@ char *json_object_encode(JSONItem *item) {
 		object = item->value.object;
 
 		do {
-			klen = strlen(object->key) + 3; // quotes and colon
+			klen = strlen(object->key) + 3; /* quotes and colon */
 			value = json_encode(object->value);
 			vlen = strlen(value);
 
@@ -63,8 +63,10 @@ void json_object_set(JSONItem *root, char *key, JSONItem *value) {
 	last = object = NULL;
 	tmp = root->value.object;
 
-	// loop through the chain of items, recording which one is the
-	// one we're looking for and which is last, so we can append later
+	/*
+	 * loop through the chain of items, recording which one is the
+	 * one we're looking for and which is last, so we can append later
+	 */
 	while (tmp != NULL) {
 		if (strcmp(tmp->key, key) == 0)
 			object = tmp;
@@ -75,7 +77,7 @@ void json_object_set(JSONItem *root, char *key, JSONItem *value) {
 		tmp = tmp->next;
 	}
 
-	// no object found? allocate a new one
+	/* no object found? allocate a new one */
 	if (object == NULL) {
 		object = (JSONObject *)malloc(sizeof(JSONObject));
 		memset(object, 0, sizeof(JSONObject));
@@ -85,7 +87,7 @@ void json_object_set(JSONItem *root, char *key, JSONItem *value) {
 		} else {
 			last->next = object;
 		}
-	} else { // an object was found, so clear the values for setting
+	} else { /* an object was found, so clear the values for setting */
 		free(object->key);
 		json_free(object->value);
 	}

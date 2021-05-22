@@ -27,18 +27,17 @@ static const struct {
 
 #include "grammar.c"
 
-int regmatch(char *pattern, char *string) {
+size_t regmatch(char *pattern, char *string) {
 	regex_t reg;
 	regmatch_t match;
-	int result;
+	size_t result;
 
-	// default to programming errors
 	result = -1;
 
 	if (regcomp(&reg, pattern, REG_EXTENDED|REG_NEWLINE) == 0) {
 		switch (regexec(&reg, string, 1, &match, 0)) {
 			case 0:
-				result = match.rm_eo - match.rm_so;
+				result = (size_t)(match.rm_eo - match.rm_so);
 				break;
 
 			case REG_NOMATCH:
@@ -50,14 +49,12 @@ int regmatch(char *pattern, char *string) {
 	return result;
 }
 
-int tok(char **in, int *toklen) {
+int tok(char **in, size_t *toklen) {
 	int i;
 
-	// skip any whitespace before the token
 	while (**in == ' ' || **in == '\n' || **in == '\r' || **in == '\t')
 		(*in)++;
 
-	// end at NULL
 	if (**in == 0)
 		return TOK_END;
 
@@ -72,7 +69,7 @@ int tok(char **in, int *toklen) {
 /*
  * IRIX doesn't have a strndup function, so here's a homemade one
  */
-char *dup(char *str, size_t len) {
+char *dup(const char *str, size_t len) {
 	char *out = (char *)malloc(len+1);
 
 	if (!out)
@@ -84,10 +81,11 @@ char *dup(char *str, size_t len) {
 	return out;
 }
 
-JSONItem *json_decode(char *input) {
+JSONItem *json_decode(const char *input) {
 	void *parser;
 	char *p, *ttext;
-	int token, toklen;
+	int token;
+	size_t toklen;
 	JSONItem *root;
 
 	root = (JSONItem *)malloc(sizeof(JSONItem));
@@ -104,7 +102,6 @@ JSONItem *json_decode(char *input) {
 			if (token == TOK_INVALID)
 				break;
 
-			// don't include the quotes in strings
 			if (token == TOK_STRING) {
 				ttext = dup(p+1, toklen-2);
 			} else {

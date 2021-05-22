@@ -9,7 +9,7 @@ char *json_list_encode(JSONItem *item) {
 	JSONList *list;
 	char *value;
 
-	char *output = (char *)malloc(3); // default to []\0
+	char *output = (char *)malloc(3); /* default to []\0 */
 
 	assert(item->type == JSON_LIST);
 
@@ -139,7 +139,7 @@ void json_list_delete(JSONItem *root, int index) {
 
 	for (i = 0; list != NULL; i++) {
 		if (i == index) {
-			if (i == 0) { // last == NULL
+			if (i == 0) { /* last == NULL */
 				root->value.list = list->next;
 			} else {
 				last->next = list->next;

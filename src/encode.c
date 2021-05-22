@@ -22,6 +22,7 @@ char *json_encode(JSONItem *item) {
 		item = json_create(JSON_NULL);
 
 	switch (item->type) {
+		default:
 		case JSON_NULL:
 			output = (char *)malloc(strlen(nullstr) + 1);
 			strcpy(output, nullstr);

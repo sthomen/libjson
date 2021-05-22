@@ -4,7 +4,7 @@
 
 #include "number.h"
 
-// space to allocate for decimals
+/* space to allocate for decimals */
 #define NUMBER_DECIMALS 10
 
 /**
@@ -33,7 +33,7 @@ char *number_to_string(double number) {
 	int len_symbols = 1;
 	int len_decimal = NUMBER_DECIMALS;
 
-	// there's a minus symbol
+	/* there's a minus symbol */
 	if (number < 0)
 		len_symbols++;
 
@@ -41,13 +41,13 @@ char *number_to_string(double number) {
 
 	len_whole = 1 + (int)floor(log10(tmp));
 
-	// no decimals
+	/* no decimals */
 	if (floor(tmp) == tmp) {
 		len_decimal = 0;
 		len_symbols--;
 	}
 
-	len = len_whole + len_decimal + len_symbols + 1; // + null
+	len = len_whole + len_decimal + len_symbols + 1; /* + null */
 
 	output = (char *)malloc(len);
 
