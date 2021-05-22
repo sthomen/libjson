@@ -13,7 +13,8 @@
 	} Pair;
 }
 
-%syntax_error {
+// suppress warnings about root being unused (even though it is being used)
+%destructor warning_suppression {
 	(void)root;
 }
 
