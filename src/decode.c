@@ -20,8 +20,8 @@ static const struct {
 	{ "^,",                        TOK_COMMA },
 	{ "^\\[",                      TOK_LBRACKET },
 	{ "^\\]",                      TOK_RBRACKET },
-	{ "^{",                        TOK_LCURLY },
-	{ "^}",                        TOK_RCURLY },
+	{ "^\\{",                      TOK_LCURLY },
+	{ "^\\}",                      TOK_RCURLY },
 	{ NULL,                        TOK_INVALID }
 };
 
