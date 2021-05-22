@@ -11,18 +11,18 @@ static const struct {
 	char * pattern;
 	int    id;
 } tokens[] = {
-	{ "^null",                     TOK_NULL },
-	{ "^true",                     TOK_TRUE },
-	{ "^false",                    TOK_FALSE },
-	{ "^\"(\\\\.|[^\\\"])*\"",     TOK_STRING },
+	{ "^null",                             TOK_NULL },
+	{ "^true",                             TOK_TRUE },
+	{ "^false",                            TOK_FALSE },
+	{ "^\"(\\\\.|[^\\\"])*\"",             TOK_STRING },
 	{ "^(-|\\+)?([0-9]+\\.[0-9]+|[0-9]+)", TOK_NUMBER },
-	{ "^:",                        TOK_COLON },
-	{ "^,",                        TOK_COMMA },
-	{ "^\\[",                      TOK_LBRACKET },
-	{ "^\\]",                      TOK_RBRACKET },
-	{ "^\\{",                      TOK_LCURLY },
-	{ "^\\}",                      TOK_RCURLY },
-	{ NULL,                        TOK_INVALID }
+	{ "^:",                                TOK_COLON },
+	{ "^,",                                TOK_COMMA },
+	{ "^\\[",                              TOK_LBRACKET },
+	{ "^\\]",                              TOK_RBRACKET },
+	{ "^\\{",                              TOK_LCURLY },
+	{ "^\\}",                              TOK_RCURLY },
+	{ NULL,                                TOK_INVALID }
 };
 
 #include "grammar.c"
