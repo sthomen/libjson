@@ -54,7 +54,8 @@ int tok(char **in, int *toklen) {
 	int i;
 
 	// skip any whitespace before the token
-	while ((**in == ' ' || **in == '\n' || **in == '\r' || **in == '\t') && (**in)++);
+	while (**in == ' ' || **in == '\n' || **in == '\r' || **in == '\t')
+		(*in)++;
 
 	// end at NULL
 	if (**in == 0)
