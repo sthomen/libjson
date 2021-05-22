@@ -2,5 +2,7 @@ syntax:glob
 *.o
 *.so
 *.so.*
+src/grammar.h
+src/grammar.c
 src/grammar.out
 test
