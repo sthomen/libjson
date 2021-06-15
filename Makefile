@@ -12,7 +12,7 @@ INSTALL ?= install
 LEMON ?= lemon
 
 CCARGS ?= -fPIC
-CFLAGS += $(CCARGS) -Iinclude
+CFLAGS += $(CCARGS) -I.
 
 LDARGS ?= -lm -shared
 LDFLAGS += $(LDARGS)
@@ -47,14 +47,14 @@ src/grammar.c: src/grammar.y
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	$(RM) $(LIB) $(LIB_SO) $(LIB_SO_MAJOR)
+	$(RM) $(LIB)
 	$(RM) $(OBJS)
 	$(RM) src/grammar.c src/grammar.h src/grammar.out
-	$(RM) test
+	$(RM) test $(LIB_SO)
 
 install: $(LIB)
 	$(INSTALL) -d $(PREFIX)/include
-	$(INSTALL) -m 644 include/json.h $(PREFIX)/include
+	$(INSTALL) -m 644 json.h $(PREFIX)/include
 	$(INSTALL) -d $(PREFIX)/lib
 	$(INSTALL) -m 755 $(LIB) $(PREFIX)/lib
 	$(LN) $(LIB) $(PREFIX)/lib/$(LIB_SO)
@@ -68,5 +68,6 @@ CMOCKA_CFLAGS = -I$(CMOCKA_PREFIX)/include
 CMOCKA_LDFLAGS = -L$(CMOCKA_PREFIX)/lib -Wl,-rpath,$(CMOCKA_PREFIX)/lib -lcmocka
 
 test: $(LIB) src/test.c
+	$(LN) $(LIB) $(LIB_SO)
 	$(CC) $(CMOCKA_CFLAGS) $(TEST_CFLAGS) -o $@ src/test.c $(TEST_LDFLAGS) $(CMOCKA_LDFLAGS)
 	./test
