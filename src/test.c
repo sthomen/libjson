@@ -9,8 +9,6 @@
 
 #include "json.h"
 
-
-
 /*************************************************************************
  * Nulls
  ************************************************************************/
@@ -799,6 +797,41 @@ void given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_
 	
 }
 
+void given_extra_data_after_a_list_json_decode_should_return_an_error(void **state) {
+	JSONItem *item;
+
+	item = json_decode("[]x");
+
+	assert_null(item);
+
+	json_free(item);
+
+	item = json_decode("{}x");
+
+	assert_null(item);
+
+	json_free(item);
+
+	item = json_decode("nullx");
+
+	assert_null(item);
+
+	json_free(item);
+
+	item = json_decode("falsex");
+
+	assert_null(item);
+
+	json_free(item);
+
+	// and finally a tricky one, when the extra data is a valid token
+	item = json_decode("null null");
+
+	assert_null(item);
+
+	json_free(item);
+}
+
 int main(void) {
 	struct CMUnitTest tests[] = {
 		/* encoding, basic values */
@@ -857,7 +890,8 @@ int main(void) {
 		cmocka_unit_test(given_json_with_an_empty_object_decode_should_produce_an_empty_JSON_OBJECT_object),
 		cmocka_unit_test(given_a_json_string_with_an_escaped_quote_decode_should_produce_a_JSON_STRING_object_with_the_entire_string),
 		cmocka_unit_test(given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_with_the_items),
-		cmocka_unit_test(given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items)
+		cmocka_unit_test(given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items),
+		cmocka_unit_test(given_extra_data_after_a_list_json_decode_should_return_an_error)
 	};
 		
 
