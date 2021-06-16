@@ -5,7 +5,7 @@ include version.mk
 CC ?= cc
 
 RM ?= rm -f
-LN ?= ln -s
+LN ?= ln -sf
 
 INSTALL ?= install
 
