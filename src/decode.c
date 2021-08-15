@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include <regex.h>
 
+#ifdef __sgi
+char *strndup(const char *, size_t);
+#else
+#include <string.h>
+#endif
+
 #include "json.h"
 #include "grammar.h"
 
@@ -66,21 +72,6 @@ int tok(char **in, size_t *toklen) {
 	return TOK_INVALID;
 }
 
-/*
- * IRIX doesn't have a strndup function, so here's a homemade one
- */
-char *dup(const char *str, size_t len) {
-	char *out = (char *)malloc(len+1);
-
-	if (!out)
-		return NULL;
-
-	memcpy(out, str, len);
-	out[len] = '\0';
-
-	return out;
-}
-
 JSONItem *json_decode(const char *input) {
 	void *parser;
 	char *p, *ttext;
@@ -103,9 +94,9 @@ JSONItem *json_decode(const char *input) {
 				break;
 
 			if (token == TOK_STRING) {
-				ttext = dup(p+1, toklen-2);
+				ttext = strndup(p+1, toklen-2);
 			} else {
-				ttext = dup(p, toklen);
+				ttext = strndup(p, toklen);
 			}
 			
 			if (!ttext)
