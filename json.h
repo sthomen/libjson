@@ -4,6 +4,7 @@
 typedef struct json_item JSONItem;
 typedef struct json_list JSONList;
 typedef struct json_object JSONObject;
+typedef struct json_decode_state JSONDecodeState;
 
 struct json_item {
 	enum json_types {
@@ -35,7 +36,16 @@ struct json_object {
 	JSONObject *next;
 };
 
+
+struct json_decode_state {
+	JSONItem *root;
+	int line;
+	int offset;
+	char *token;
+};
+
 JSONItem *json_decode(const char *);
+JSONDecodeState *json_decode_state(const char *);
 char *json_encode(JSONItem *);
 
 JSONItem *json_create(enum json_types);

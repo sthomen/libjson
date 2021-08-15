@@ -31,11 +31,6 @@ static const struct {
 	{ NULL,                                TOK_INVALID  }
 };
 
-struct decode_state {
-	JSONItem *root;
-	char *token;
-};
-
 #include "grammar.c"
 
 size_t regmatch(char *pattern, char *string) {
@@ -78,15 +73,37 @@ int tok(char **in, size_t *toklen) {
 }
 
 JSONItem *json_decode(const char *input) {
+	JSONDecodeState *state;
+	JSONItem *root;
+
+	state = json_decode_state(input);
+
+	/* clean up state before returning the root */
+
+	if (state->token != NULL)
+		free(state->token);
+
+	root = state->root;
+
+	free(state);
+
+	return root;
+}
+
+JSONDecodeState *json_decode_state(const char *input) {
 	void *parser;
 	char *p, *ttext;
 	int token;
 	size_t toklen;
-	struct decode_state state;
+	JSONDecodeState *state;
 
-	state.token = NULL;
-	state.root = (JSONItem *)malloc(sizeof(JSONItem));
-	memset(state.root, 0, sizeof(JSONItem));
+	state = (JSONDecodeState *)malloc(sizeof(JSONDecodeState));
+	state->line = 0;
+	state->offset = 0;
+
+	state->token = NULL;
+	state->root = (JSONItem *)malloc(sizeof(JSONItem));
+	memset(state->root, 0, sizeof(JSONItem));
 
 	parser = ParseAlloc(malloc);
 
@@ -108,28 +125,26 @@ JSONItem *json_decode(const char *input) {
 			if (!ttext)
 				break;
 
-			Parse(parser, token, ttext, &state);
+			Parse(parser, token, ttext, state);
+
+			if (state->token != NULL) {
+				token = TOK_INVALID;
+				break;
+			}
 
 			p += toklen;
 		}
 
-		Parse(parser, 0, "", &state);
+		Parse(parser, 0, "", state);
 
 		ParseFree(parser, free);
 	}
 
-	if (state.token != NULL) {
-		// TODO state.token now contains the unexpected token in the
-		// bagging area, and can be communicated upstream somehow.
-		free(state.token);
-		token = TOK_INVALID;
-	}
-
 	if (token == TOK_INVALID) {
-		json_free(state.root);
-		state.root = NULL;
+		json_free(state->root);
+		state->root = NULL;
 	}
 
-	return state.root;
+	return state;
 }
 

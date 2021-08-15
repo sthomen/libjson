@@ -1,5 +1,5 @@
 %token_prefix	TOK_
-%extra_argument { struct decode_state *state }
+%extra_argument { JSONDecodeState *state }
 
 %include {
 	#include <stdlib.h>
