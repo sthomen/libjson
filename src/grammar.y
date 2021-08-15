@@ -1,5 +1,5 @@
 %token_prefix	TOK_
-%extra_argument { JSONItem *root }
+%extra_argument { struct decode_state *state }
 
 %include {
 	#include <stdlib.h>
@@ -13,12 +13,16 @@
 	} Pair;
 }
 
-/* suppress warnings about root being unused (even though it is being used) */
+/* suppress warnings about state being unused (even though it is being used) */
 %destructor warning_suppression {
-	(void)root;
+	(void)state;
 }
 
-start		::= item(item). { memcpy(root, item, sizeof(JSONItem)); }
+%syntax_error {
+	state->token = strdup(TOKEN);
+}
+
+start		::= item(item). { memcpy(state->root, item, sizeof(JSONItem)); }
 
 item(item) 	::= NULL.		{ item = json_create(JSON_NULL); }
 item(item)	::= STRING(str).{ item = json_create_string(str); }

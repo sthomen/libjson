@@ -31,6 +31,11 @@ static const struct {
 	{ NULL,                                TOK_INVALID  }
 };
 
+struct decode_state {
+	JSONItem *root;
+	char *token;
+};
+
 #include "grammar.c"
 
 size_t regmatch(char *pattern, char *string) {
@@ -77,10 +82,11 @@ JSONItem *json_decode(const char *input) {
 	char *p, *ttext;
 	int token;
 	size_t toklen;
-	JSONItem *root;
+	struct decode_state state;
 
-	root = (JSONItem *)malloc(sizeof(JSONItem));
-	memset(root, 0, sizeof(JSONItem));
+	state.token = NULL;
+	state.root = (JSONItem *)malloc(sizeof(JSONItem));
+	memset(state.root, 0, sizeof(JSONItem));
 
 	parser = ParseAlloc(malloc);
 
@@ -102,21 +108,28 @@ JSONItem *json_decode(const char *input) {
 			if (!ttext)
 				break;
 
-			Parse(parser, token, ttext, root);
+			Parse(parser, token, ttext, &state);
 
 			p += toklen;
 		}
 
-		Parse(parser, 0, "", root);
+		Parse(parser, 0, "", &state);
 
 		ParseFree(parser, free);
 	}
 
-	if (token == TOK_INVALID) {
-		json_free(root);
-		root = NULL;
+	if (state.token != NULL) {
+		// TODO state.token now contains the unexpected token in the
+		// bagging area, and can be communicated upstream somehow.
+		free(state.token);
+		token = TOK_INVALID;
 	}
 
-	return root;
+	if (token == TOK_INVALID) {
+		json_free(state.root);
+		state.root = NULL;
+	}
+
+	return state.root;
 }
 
