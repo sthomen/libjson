@@ -1,0 +1,11 @@
+#define TOK_NULL                             1
+#define TOK_STRING                           2
+#define TOK_NUMBER                           3
+#define TOK_TRUE                             4
+#define TOK_FALSE                            5
+#define TOK_LBRACKET                         6
+#define TOK_RBRACKET                         7
+#define TOK_LCURLY                           8
+#define TOK_RCURLY                           9
+#define TOK_COMMA                           10
+#define TOK_COLON                           11
