@@ -1,11 +1,10 @@
 /**
  * IRIX doesn't have strndup, so here's an implementation
  */
-#ifdef __sgi
-
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __sgi
 char *strndup(const char *str, size_t len) {
 	char *out = (char *)malloc(len+1);
 
@@ -17,4 +16,5 @@ char *strndup(const char *str, size_t len) {
 
 	return out;
 }
+
 #endif
