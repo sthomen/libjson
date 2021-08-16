@@ -33,7 +33,7 @@ static const struct {
 
 #include "grammar.c"
 
-size_t regmatch(char *pattern, char *string) {
+size_t regmatch(const char *pattern, const char *string) {
 	regex_t reg;
 	regmatch_t match;
 	size_t result;
@@ -55,7 +55,7 @@ size_t regmatch(char *pattern, char *string) {
 	return result;
 }
 
-int tok(char **in, size_t *toklen) {
+int tok(const char **in, size_t *toklen) {
 	int i;
 
 	while (**in == ' ' || **in == '\n' || **in == '\r' || **in == '\t')
@@ -90,8 +90,9 @@ JSONItem *json_decode(const char *input) {
 	return root;
 }
 
-void update_state_position(char *input, char *stop, JSONDecodeState *state) {
-	char *p, *start;
+void update_state_position(const char *input, const char *stop, JSONDecodeState *state) {
+	const char *p;
+	const char *start;
 
 	start = input;
 
@@ -109,7 +110,7 @@ void update_state_position(char *input, char *stop, JSONDecodeState *state) {
 
 JSONDecodeState *json_decode_state(const char *input) {
 	void *parser;
-	char *p, *ttext;
+	const char *p, *ttext;
 	int token;
 	size_t toklen;
 	JSONDecodeState *state;
@@ -129,7 +130,7 @@ JSONDecodeState *json_decode_state(const char *input) {
 	token = TOK_INVALID;
 
 	if (*input != '\0' && parser) {
-		p = (char *)input;
+		p = input;
 
 		while ((token = tok(&p, &toklen)) > 0) {
 			if (token == TOK_INVALID)
@@ -144,7 +145,7 @@ JSONDecodeState *json_decode_state(const char *input) {
 			if (!ttext)
 				break;
 
-			Parse(parser, token, ttext, state);
+			Parse(parser, token, (char *)ttext, state);
 
 			if (state->token != NULL) {
 				token = TOK_INVALID;
