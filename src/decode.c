@@ -118,11 +118,13 @@ JSONDecodeState *json_decode_state(const char *input) {
 	p = NULL;
 
 	state = (JSONDecodeState *)malloc(sizeof(JSONDecodeState));
+	assert(state != NULL);
 	state->line = 1;
 	state->offset = 0;
 
 	state->token = NULL;
 	state->root = (JSONItem *)malloc(sizeof(JSONItem));
+	assert(state->root != NULL);
 	memset(state->root, 0, sizeof(JSONItem));
 
 	parser = ParseAlloc(malloc);
@@ -141,9 +143,8 @@ JSONDecodeState *json_decode_state(const char *input) {
 			} else {
 				ttext = strndup(p, toklen);
 			}
-			
-			if (!ttext)
-				break;
+
+			assert(ttext != NULL);
 
 			Parse(parser, token, (char *)ttext, state);
 
