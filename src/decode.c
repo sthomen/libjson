@@ -115,8 +115,6 @@ JSONDecodeState *json_decode_state(const char *input) {
 	size_t toklen;
 	JSONDecodeState *state;
 
-	p = NULL;
-
 	state = (JSONDecodeState *)malloc(sizeof(JSONDecodeState));
 	assert(state != NULL);
 	state->line = 1;
@@ -129,6 +127,7 @@ JSONDecodeState *json_decode_state(const char *input) {
 
 	parser = ParseAlloc(malloc);
 
+	p = NULL;
 	token = TOK_INVALID;
 
 	if (*input != '\0' && parser) {
