@@ -832,6 +832,40 @@ void given_extra_data_after_a_list_json_decode_should_return_an_error(void **sta
 	json_free(item);
 }
 
+void parse_errors_should_indicate_where_errors_happened(void **state) {
+	JSONDecodeState *js;
+
+	// non-JSON
+	js = json_decode_state("error");
+
+	assert_null(js->root);
+
+	assert_int_equal(1, js->line);
+	assert_int_equal(0, js->offset);
+
+	free(js);
+
+	// all in a line
+	js = json_decode_state("[true, false, error]");
+
+	assert_null(js->root);
+
+	assert_int_equal(1, js->line);
+	assert_int_equal(14, js->offset);
+
+	free(js);
+
+	// some kind of formatting
+	js = json_decode_state("[\n\ttrue,\n\tfalse,\n\terror\n]\n");
+
+	assert_null(js->root);
+
+	assert_int_equal(4, js->line);
+	assert_int_equal(2, js->offset);
+
+	free(js);
+}
+
 int main(void) {
 	struct CMUnitTest tests[] = {
 		/* encoding, basic values */
@@ -891,7 +925,8 @@ int main(void) {
 		cmocka_unit_test(given_a_json_string_with_an_escaped_quote_decode_should_produce_a_JSON_STRING_object_with_the_entire_string),
 		cmocka_unit_test(given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_with_the_items),
 		cmocka_unit_test(given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_the_items),
-		cmocka_unit_test(given_extra_data_after_a_list_json_decode_should_return_an_error)
+		cmocka_unit_test(given_extra_data_after_a_list_json_decode_should_return_an_error),
+		cmocka_unit_test(parse_errors_should_indicate_where_errors_happened)
 	};
 		
 

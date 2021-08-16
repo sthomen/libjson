@@ -90,6 +90,23 @@ JSONItem *json_decode(const char *input) {
 	return root;
 }
 
+void update_state_position(char *input, char *stop, JSONDecodeState *state) {
+	char *p, *start;
+
+	start = input;
+
+	for (p = stop; p != input; p--) {
+		if (*p == '\n') {
+			if (start == input)
+				start = p;
+
+			state->line++;
+		}
+	}
+
+	state->offset = stop - start;
+}
+
 JSONDecodeState *json_decode_state(const char *input) {
 	void *parser;
 	char *p, *ttext;
@@ -97,8 +114,10 @@ JSONDecodeState *json_decode_state(const char *input) {
 	size_t toklen;
 	JSONDecodeState *state;
 
+	p = NULL;
+
 	state = (JSONDecodeState *)malloc(sizeof(JSONDecodeState));
-	state->line = 0;
+	state->line = 1;
 	state->offset = 0;
 
 	state->token = NULL;
@@ -141,6 +160,10 @@ JSONDecodeState *json_decode_state(const char *input) {
 	}
 
 	if (token == TOK_INVALID) {
+		// p might be unitialized if the string is empty
+		if (p != NULL)
+			update_state_position(input, p, state);
+
 		json_free(state->root);
 		state->root = NULL;
 	}
