@@ -32,13 +32,6 @@ JSONItem *json_create_boolean(unsigned int value) {
 	return item;
 }
 
-JSONItem *json_create_number(double value) {
-	JSONItem *item = json_create(JSON_NUMBER);
-
-	item->value.number = value;
-	return item;
-}
-
 void json_free(JSONItem *item) {
 	if (item == NULL)
 		return;
@@ -85,7 +78,7 @@ void json_dump(JSONItem *item) {
 			break;
 
 		case JSON_NUMBER:
-			printf("number: %f\n", item->value.number);
+			printf("number: %s\n", item->value.string);
 			break;
 
 		case JSON_BOOLEAN:

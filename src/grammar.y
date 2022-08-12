@@ -26,7 +26,7 @@ start		::= item(item). { memcpy(state->root, item, sizeof(JSONItem)); }
 
 item(item) 	::= NULL.		{ item = json_create(JSON_NULL); }
 item(item)	::= STRING(str).{ item = json_create_string(str); }
-item(item)	::= NUMBER(str).{ item = json_create_number(strtod(str, NULL)); }
+item(item)	::= NUMBER(str).{ item = json_create_number_str(str); }
 item(item)	::= TRUE.		{ item = json_create_boolean(1); }
 item(item)	::= FALSE.		{ item = json_create_boolean(0); }
 

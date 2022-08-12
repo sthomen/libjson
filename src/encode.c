@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "number.h"
 #include "list.h"
 #include "object.h"
 
@@ -34,7 +33,13 @@ char *json_encode(JSONItem *item) {
 			break;
 
 		case JSON_NUMBER:
-			output = number_to_string(item->value.number);
+			if (item->value.string == NULL) {
+				output = (char *)malloc(strlen(nullstr) + 1);
+				strcpy(output, nullstr);
+			} else {
+				output = (char *)malloc(strlen(item->value.string));
+				sprintf(output, "%s", item->value.string);
+			}
 			break;
 
 		case JSON_STRING:
@@ -58,4 +63,3 @@ char *json_encode(JSONItem *item) {
 
 	return output;
 }
-

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <regex.h>
 
 #ifdef __sgi

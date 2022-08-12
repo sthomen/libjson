@@ -7,6 +7,9 @@
 /* malloc/free */
 #include <stdlib.h>
 
+/* NaN and Infinity */
+#include <math.h>
+
 #include "json.h"
 
 /*************************************************************************
@@ -123,14 +126,11 @@ void encoding_a_string_item_includes_quotes(void **state) {
  * Numbers
  ************************************************************************/
 
-void encoding_a_whole_number_outputs_no_decimals(void **state) {
+void encoding_a_whole_number_float_outputs_no_decimals(void **state) {
 	JSONItem *item;
 	char *json;
 
-	item = json_create(JSON_NUMBER);
-	
-	item->value.number = 42.0;
-
+	item = json_create_number(42);
 	json = json_encode(item);
 
 	assert_string_equal("42", json);
@@ -143,31 +143,13 @@ void encoding_a_decimal_number_outputs_decimals(void **state) {
 	JSONItem *item;
 	char *json;
 
-	item = json_create(JSON_NUMBER);
-	
-	item->value.number = 4.2;
-
+	/* This number is carefully chosen as not to be skewed by floating point
+	 * numbers being imprecise.
+	 */
+	item = json_create_number(123.123);
 	json = json_encode(item);
 
-	assert_string_equal("4.2", json);
-
-	free(json);
-	json_free(item);
-}
-
-void encoding_a_floating_point_number_includes_trailing_zeroes(void **state) {
-	JSONItem *item;
-	char *json;
-
-	skip(); /* this doesn't happen and can't while number_to_string uses sprintf */
-
-	item = json_create(JSON_NUMBER);
-	
-	item->value.number = 4.20;
-
-	json = json_encode(item);
-
-	assert_string_equal("4.20", json);
+	assert_string_equal("123.123", json);
 
 	free(json);
 	json_free(item);
@@ -177,15 +159,34 @@ void encoding_a_large_floating_point_number_outputs_a_decimal_string(void **stat
 	JSONItem *item;
 	char *json;
 
-	skip(); /* we can't guarantee anything about the output from number_to_string here */
-
-	item = json_create(JSON_NUMBER);
-	
-	item->value.number = 1234123.1234567;
-
+	/* This number is carefully chosen as not to be skewed by floating point
+	 * numbers being imprecise.
+	 */
+	item = json_create_number(123123.123); 
 	json = json_encode(item);
 
-	assert_string_equal("1234123.1234567", json);
+	assert_string_equal("123123.123", json);
+
+	free(json);
+	json_free(item);
+}
+
+void encoding_a_NAN_or_INFINITY_should_produce_a_null_string(void **state) {
+	JSONItem *item;
+	char *json;
+
+	item = json_create_number(NAN);
+	json = json_encode(item);
+
+	assert_string_equal("null", json);
+
+	free(json);
+	json_free(item);
+
+	item = json_create_number(INFINITY);
+	json = json_encode(item);
+
+	assert_string_equal("null", json);
 
 	free(json);
 	json_free(item);
@@ -423,8 +424,7 @@ void encoding_a_list_with_all_bare_types(void **state) {
 	assert_string_equal("[\"a string\",null,null,true,false]", json);
 	free(json);
 
-	item = json_create(JSON_NUMBER);
-	item->value.number = 3.14;
+	item = json_create_number_str("3.14");
 	json_list_add(list, item);
 
 	json = json_encode(list);
@@ -637,35 +637,35 @@ void given_a_json_number_decode_should_produce_a_JSON_NUMBER_object(void **state
 
 	assert_non_null(item);
 	assert_int_equal(item->type, JSON_NUMBER);
-	assert_float_equal(1.0, (float)item->value.number, 0.0);
+	assert_float_equal(1.0, json_number(item), 0.0);
 	json_free(item);
 
 	item = json_decode("1234");
 
 	assert_non_null(item);
 	assert_int_equal(item->type, JSON_NUMBER);
-	assert_float_equal(1234.0, (float)item->value.number, 0.0);
+	assert_float_equal(1234.0, json_number(item), 0.0);
 	json_free(item);
 
 	item = json_decode("12.34");
 
 	assert_non_null(item);
 	assert_int_equal(item->type, JSON_NUMBER);
-	assert_float_equal(12.34, (float)item->value.number, 0.01);
+	assert_float_equal(12.34, json_number(item), 0.01);
 	json_free(item);
 
 	item = json_decode("-42");
 
 	assert_non_null(item);
 	assert_int_equal(item->type, JSON_NUMBER);
-	assert_float_equal(-42.0, (float)item->value.number, 0.0);
+	assert_float_equal(-42.0, json_number(item), 0.0);
 	json_free(item);
 
 	item = json_decode("+42.5");
 
 	assert_non_null(item);
 	assert_int_equal(item->type, JSON_NUMBER);
-	assert_float_equal(42.5, (float)item->value.number, 0.01);
+	assert_float_equal(42.5, json_number(item), 0.01);
 	json_free(item);
 }
 
@@ -748,7 +748,7 @@ void given_json_with_a_list_with_some_items_decode_should_produce_a_JSON_LIST_wi
 
 	item = json_list_get(list, 3);
 	assert_int_equal(JSON_NUMBER, item->type);
-	assert_float_equal(1.23, (float)item->value.number, 0.0);
+	assert_float_equal(1.23, json_number(item), 0.0);
 
 	item = json_list_get(list, 4);
 	assert_int_equal(JSON_STRING, item->type);
@@ -787,7 +787,7 @@ void given_json_with_an_object_and_some_items_should_produce_a_JSON_OBJECT_with_
 
 	item = json_object_get(object, "fourth");
 	assert_int_equal(JSON_NUMBER, item->type);
-	assert_float_equal(1.23, (float)item->value.number, 0.0);
+	assert_float_equal(1.23, json_number(item), 0.0);
 
 	item = json_object_get(object, "fifth");
 	assert_int_equal(JSON_STRING, item->type);
@@ -881,10 +881,10 @@ int main(void) {
 		cmocka_unit_test(encoding_a_string_item_includes_quotes),
 
 		/* encoding, numbers */
-		cmocka_unit_test(encoding_a_whole_number_outputs_no_decimals),
+		cmocka_unit_test(encoding_a_whole_number_float_outputs_no_decimals),
 		cmocka_unit_test(encoding_a_decimal_number_outputs_decimals),
-		cmocka_unit_test(encoding_a_floating_point_number_includes_trailing_zeroes),
 		cmocka_unit_test(encoding_a_large_floating_point_number_outputs_a_decimal_string),
+		cmocka_unit_test(encoding_a_NAN_or_INFINITY_should_produce_a_null_string),
 
 		/* lists */
 		cmocka_unit_test(adding_an_item_to_an_empty_list_makes_it_contain_the_item),

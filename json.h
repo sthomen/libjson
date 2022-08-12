@@ -18,7 +18,6 @@ struct json_item {
 
 	union {
 		unsigned int boolean : 1;
-		double       number;
 		char         *string;
 		JSONList     *list;
 		JSONObject   *object;
@@ -51,7 +50,10 @@ char *json_encode(JSONItem *);
 JSONItem *json_create(enum json_types);
 JSONItem *json_create_string(char *);
 JSONItem *json_create_boolean(unsigned int);
+
 JSONItem *json_create_number(double);
+JSONItem *json_create_number_str(char *);
+double json_number(JSONItem *);
 
 #define JSON_LIST_LAST -1
 

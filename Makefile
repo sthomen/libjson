@@ -32,6 +32,7 @@ SRCS =\
 	src/json.c \
 	src/encode.c \
 	src/strndup.c \
+	src/ftoa.c \
 	src/decode.c
 
 OBJS = ${SRCS:S/.c/.o/g}
